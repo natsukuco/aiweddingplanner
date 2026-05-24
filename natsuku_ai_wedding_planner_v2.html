@@ -1,366 +1,800 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Natsuku — AI Wedding Planner</title>
+<meta name="description" content="A personalised AI wedding planning guide for SG Malay couples, by Natsuku Photography."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap');
-*{box-sizing:border-box;margin:0;padding:0}
+/* ── RESET & ROOT ────────────────────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
 :root{
-  --forest:#3F4F46;--sienna:#A1826B;--teal:#224D5B;
-  --cream:#F4EEDC;--parch:#EDE6CF;--dust:#C5B49A;--mist:#8CA89E;
+  --forest:#3F4F46;
+  --forest-dk:#2C3830;
+  --sienna:#A1826B;
+  --sienna-lt:#C4A98A;
+  --teal:#224D5B;
+  --cream:#F4EEDC;
+  --parch:#EDE6CF;
+  --dust:#C5B49A;
+  --mist:#8CA89E;
+  --ink:#2A2A24;
+  --white:#FFFFFF;
+  --error:#C97B7B;
 }
-.root{font-family:'Jost',sans-serif;background:transparent}
-.hdr{background:var(--forest);padding:22px 28px 18px;display:flex;align-items:flex-end;justify-content:space-between}
-.kanji{font-family:'Cormorant Garamond',serif;font-size:10px;letter-spacing:.3em;color:var(--sienna);text-transform:uppercase;margin-bottom:3px}
-.htitle{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:300;color:var(--cream);letter-spacing:.1em;line-height:1}
-.hsub{font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:var(--mist);margin-top:4px;font-weight:300}
-.pills{display:flex;gap:5px}
-.pill{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;border:1.5px solid rgba(244,238,220,.2);color:rgba(244,238,220,.35);transition:all .3s;font-family:'Jost',sans-serif}
+
+body{
+  font-family:'Jost',sans-serif;
+  background:var(--cream);
+  color:var(--ink);
+  min-height:100vh;
+  line-height:1.6;
+}
+
+/* grain overlay */
+body::after{
+  content:'';
+  position:fixed;inset:0;
+  pointer-events:none;z-index:9999;opacity:.022;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size:200px 200px;
+}
+
+.serif{font-family:'Cormorant Garamond',Georgia,serif}
+
+/* ── PAGE WRAPPER ────────────────────────────────────────────── */
+.page{
+  min-height:100vh;
+  display:flex;flex-direction:column;align-items:center;
+  padding:40px 16px 80px;
+}
+
+.card{
+  width:100%;max-width:640px;
+  box-shadow:0 8px 48px rgba(63,79,70,.12),0 2px 12px rgba(63,79,70,.08);
+}
+
+/* ── HEADER ──────────────────────────────────────────────────── */
+.hdr{
+  background:var(--forest);
+  padding:28px 32px 22px;
+  display:flex;align-items:flex-end;justify-content:space-between;
+  gap:16px;
+}
+.hdr-left{}
+.kanji{
+  font-family:'Cormorant Garamond',serif;
+  font-size:11px;letter-spacing:.3em;
+  color:var(--sienna);text-transform:uppercase;margin-bottom:4px;
+}
+.htitle{
+  font-family:'Cormorant Garamond',serif;
+  font-size:30px;font-weight:300;
+  color:var(--cream);letter-spacing:.1em;line-height:1;
+}
+.hsub{
+  font-size:10px;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--mist);margin-top:5px;font-weight:300;
+}
+.pills{display:flex;gap:5px;flex-shrink:0}
+.pill{
+  width:26px;height:26px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:500;font-family:'Jost',sans-serif;
+  border:1.5px solid rgba(244,238,220,.2);color:rgba(244,238,220,.35);
+  transition:all .3s;
+}
 .pill.done{background:var(--sienna);border-color:var(--sienna);color:var(--cream)}
 .pill.active{border-color:var(--cream);color:var(--cream)}
-.body{background:var(--cream);padding:24px 28px}
-.prog{height:2px;background:var(--parch);margin-bottom:24px}
+
+/* ── BODY ────────────────────────────────────────────────────── */
+.body{background:var(--cream);padding:28px 32px}
+
+/* progress bar */
+.prog{height:2px;background:var(--parch);margin-bottom:26px}
 .prog-fill{height:100%;background:var(--sienna);transition:width .4s ease}
-.slabel{font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:var(--sienna);margin-bottom:5px;font-family:'Jost',sans-serif}
-.stitle{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:400;color:var(--forest);margin-bottom:3px}
-.sdesc{font-size:12px;color:var(--mist);margin-bottom:20px;line-height:1.6}
-.field{margin-bottom:16px}
-.field label{display:block;font-size:10px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--teal);margin-bottom:6px;font-family:'Jost',sans-serif}
-.field input,.field select,.field textarea{
-  width:100%;padding:9px 12px;
-  background:white;border:1px solid var(--dust);
-  font-family:'Jost',sans-serif;font-size:13px;color:var(--forest);
-  outline:none;transition:border-color .2s;border-radius:0;-webkit-appearance:none
+
+/* step meta */
+.slabel{font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:var(--sienna);margin-bottom:5px}
+.stitle{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:400;color:var(--forest);margin-bottom:4px}
+.sdesc{font-size:12.5px;color:var(--mist);margin-bottom:22px;line-height:1.65}
+
+/* fields */
+.field{margin-bottom:18px}
+.field label{
+  display:block;font-size:10px;font-weight:500;
+  letter-spacing:.16em;text-transform:uppercase;
+  color:var(--teal);margin-bottom:7px;
 }
-.field select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23C5B49A'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:28px;cursor:pointer}
-.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--sienna)}
-.field textarea{resize:none;height:72px;line-height:1.6}
+.field input,.field select,.field textarea{
+  width:100%;padding:10px 14px;
+  background:var(--white);border:1px solid var(--dust);
+  font-family:'Jost',sans-serif;font-size:13.5px;color:var(--ink);
+  outline:none;border-radius:0;transition:border-color .2s;
+  -webkit-appearance:none;appearance:none;
+}
+.field select{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23C5B49A'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 14px center;
+  padding-right:34px;cursor:pointer;
+}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--sienna);outline:none}
 .field input::placeholder,.field textarea::placeholder{color:var(--dust)}
-.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.field textarea{resize:none;height:78px;line-height:1.6}
+
+/* api key field special */
+.api-wrap{position:relative}
+.api-wrap input{padding-right:44px;letter-spacing:.04em;font-size:12.5px}
+.api-toggle{
+  position:absolute;right:12px;top:50%;transform:translateY(-50%);
+  background:none;border:none;cursor:pointer;color:var(--dust);
+  font-size:11px;letter-spacing:.08em;font-family:'Jost',sans-serif;
+  transition:color .2s;padding:2px 4px;
+}
+.api-toggle:hover{color:var(--sienna)}
+
+.field .hint{font-size:11px;color:var(--mist);margin-top:5px;line-height:1.5}
+.field .hint a{color:var(--sienna);text-decoration:none}
+.field .hint a:hover{text-decoration:underline}
+
+/* two col */
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+
+/* chips */
 .chips{display:flex;flex-wrap:wrap;gap:7px}
-.chip{padding:6px 12px;border:1px solid var(--dust);background:white;font-family:'Jost',sans-serif;font-size:11px;color:var(--teal);cursor:pointer;transition:all .2s;border-radius:0}
-.chip:hover{border-color:var(--sienna)}
+.chip{
+  padding:6px 13px;border:1px solid var(--dust);background:var(--white);
+  font-family:'Jost',sans-serif;font-size:11.5px;color:var(--teal);
+  cursor:pointer;transition:all .2s;border-radius:0;
+}
+.chip:hover{border-color:var(--sienna);color:var(--sienna)}
 .chip.sel{background:var(--forest);border-color:var(--forest);color:var(--cream)}
-.rrow{display:flex;align-items:center;gap:12px}
-.rrow input[type=range]{flex:1;-webkit-appearance:none;height:2px;background:var(--dust);outline:none;cursor:pointer}
-.rrow input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--sienna);cursor:pointer}
-.rval{font-family:'Cormorant Garamond',serif;font-size:16px;color:var(--forest);min-width:70px;text-align:right;font-weight:400}
-.rule{border:none;border-top:1px solid var(--parch);margin:16px 0}
-.nav{display:flex;justify-content:space-between;align-items:center;margin-top:22px}
-.btn{padding:10px 24px;font-family:'Jost',sans-serif;font-size:10px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;cursor:pointer;border:1px solid;transition:all .2s;border-radius:0}
+
+/* range */
+.rrow{display:flex;align-items:center;gap:14px}
+.rrow input[type=range]{
+  flex:1;-webkit-appearance:none;height:2px;
+  background:var(--dust);outline:none;cursor:pointer;border:none;padding:0;
+}
+.rrow input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:15px;height:15px;
+  border-radius:50%;background:var(--sienna);cursor:pointer;
+}
+.rrow input[type=range]::-moz-range-thumb{
+  width:15px;height:15px;border-radius:50%;background:var(--sienna);cursor:pointer;border:none;
+}
+.rval{
+  font-family:'Cormorant Garamond',serif;font-size:17px;
+  color:var(--forest);min-width:72px;text-align:right;
+}
+
+.rule{border:none;border-top:1px solid var(--parch);margin:18px 0}
+
+/* budget summary */
+.sum{background:var(--forest);padding:18px 22px;margin-top:20px}
+.sum-lbl{font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:var(--mist);margin-bottom:6px}
+.sum-val{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:300;color:var(--cream)}
+.sum-note{font-size:11px;color:var(--dust);margin-top:4px;font-style:italic;font-family:'Cormorant Garamond',serif}
+
+/* nav buttons */
+.nav{display:flex;justify-content:space-between;align-items:center;margin-top:26px}
+.btn{
+  padding:11px 26px;font-family:'Jost',sans-serif;
+  font-size:10px;font-weight:500;letter-spacing:.18em;
+  text-transform:uppercase;cursor:pointer;border:1px solid;
+  border-radius:0;transition:all .2s;
+}
 .btn-back{background:transparent;border-color:var(--dust);color:var(--dust)}
 .btn-back:hover{border-color:var(--sienna);color:var(--sienna)}
 .btn-next{background:var(--forest);border-color:var(--forest);color:var(--cream)}
 .btn-next:hover{background:var(--teal);border-color:var(--teal)}
-.btn-gen{background:var(--sienna);border-color:var(--sienna);color:var(--cream);padding:11px 32px}
+.btn-gen{background:var(--sienna);border-color:var(--sienna);color:var(--cream);padding:12px 32px;font-size:11px}
 .btn-gen:hover{background:var(--forest);border-color:var(--forest)}
-.sum{background:var(--forest);padding:16px 20px;margin-top:16px}
-.sum-label{font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:var(--mist);margin-bottom:6px}
-.sum-val{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;color:var(--cream)}
-.sum-note{font-size:11px;color:var(--dust);margin-top:4px;font-style:italic}
+.btn-gen:disabled{opacity:.5;cursor:not-allowed}
+
+/* ── OUTPUT PANEL ────────────────────────────────────────────── */
+.out-hdr{
+  background:var(--forest);padding:22px 32px;
+  display:flex;align-items:flex-start;justify-content:space-between;gap:16px;
+}
+.out-names{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:300;color:var(--cream);letter-spacing:.08em;line-height:1}
+.out-sub{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--mist);margin-top:5px}
+.btn-restart{
+  padding:7px 18px;background:transparent;
+  border:1px solid rgba(244,238,220,.3);color:var(--cream);
+  font-family:'Jost',sans-serif;font-size:9px;letter-spacing:.16em;
+  text-transform:uppercase;cursor:pointer;border-radius:0;
+  transition:all .2s;white-space:nowrap;flex-shrink:0;
+}
+.btn-restart:hover{background:rgba(244,238,220,.1)}
+
+.out-body{padding:28px 32px;background:var(--cream)}
+
+/* loading */
+.loading{text-align:center;padding:52px 20px}
+.spinner{
+  width:30px;height:30px;
+  border:2px solid var(--parch);border-top-color:var(--sienna);
+  border-radius:50%;animation:spin .75s linear infinite;
+  margin:0 auto 18px;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.load-txt{font-family:'Cormorant Garamond',serif;font-size:16px;font-style:italic;color:var(--sienna)}
+
+/* plan output */
+.plan{font-family:'Jost',sans-serif;font-size:13.5px;line-height:1.78;color:var(--ink)}
+.plan h2{
+  font-family:'Cormorant Garamond',serif;font-size:21px;font-weight:400;
+  color:var(--forest);margin:30px 0 10px;padding-bottom:10px;
+  border-bottom:1px solid var(--dust);letter-spacing:.06em;
+}
+.plan h2:first-child{margin-top:0}
+.plan h3{
+  font-size:10px;font-weight:600;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--sienna);margin:18px 0 6px;
+}
+.plan p{margin-bottom:10px}
+.plan ul,.plan ol{padding-left:0;list-style:none;margin-bottom:14px}
+.plan li{
+  padding:5px 0 5px 20px;position:relative;
+  border-bottom:1px solid var(--parch);font-size:13px;
+}
+.plan li::before{content:'—';position:absolute;left:0;color:var(--sienna)}
+.plan strong{font-weight:500;color:var(--forest)}
+.plan em{font-style:italic;color:var(--mist)}
+.plan table{width:100%;border-collapse:collapse;margin:14px 0;font-size:12.5px}
+.plan th{
+  background:var(--forest);color:var(--cream);
+  padding:8px 12px;text-align:left;
+  font-size:10px;letter-spacing:.12em;text-transform:uppercase;font-weight:500;
+}
+.plan td{padding:8px 12px;border-bottom:1px solid var(--parch);vertical-align:top}
+.plan tr:nth-child(even) td{background:rgba(237,230,207,.4)}
+
+.note-box{
+  background:var(--parch);border-left:3px solid var(--sienna);
+  border-radius:0 2px 2px 0;padding:14px 18px;margin:16px 0;
+}
+.note-box p{
+  font-family:'Cormorant Garamond',serif;font-style:italic;
+  font-size:15px;color:var(--teal);margin:0;line-height:1.6;
+}
+
+/* error */
+.err-box{background:#FDF0F0;border-left:3px solid var(--error);padding:14px 18px;margin-top:14px;border-radius:0 2px 2px 0}
+.err-box p{font-size:13px;color:#9B4040;margin:0;line-height:1.5}
+.err-box code{font-size:11px;opacity:.7;display:block;margin-top:6px;word-break:break-all}
+
+/* ── FOOTER ──────────────────────────────────────────────────── */
+.footer{
+  text-align:center;margin-top:28px;
+  font-size:11px;color:var(--mist);letter-spacing:.1em;
+}
+.footer a{color:var(--sienna);text-decoration:none}
+.footer a:hover{text-decoration:underline}
+
+/* ── RESPONSIVE ──────────────────────────────────────────────── */
+@media(max-width:520px){
+  .page{padding:0 0 60px}
+  .card{box-shadow:none}
+  .hdr,.body,.out-hdr,.out-body{padding:20px 20px}
+  .two{grid-template-columns:1fr}
+  .htitle{font-size:24px}
+  .sum-val{font-size:26px}
+}
+
+/* ── PRINT ───────────────────────────────────────────────────── */
+@media print{
+  body::after{display:none}
+  .hdr .pills,.nav,.btn-restart,.footer{display:none!important}
+  .card{box-shadow:none}
+  .plan h2{page-break-after:avoid}
+  .plan table{page-break-inside:avoid}
+}
 </style>
+</head>
+<body>
 
-<h2 class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)">Natsuku AI Wedding Planner — 5-step form to generate a personalised SG Malay wedding plan</h2>
+<div class="page">
+  <div class="card">
 
-<div class="root">
-  <div class="hdr">
-    <div>
-      <div class="kanji">懐く — fondly remembered</div>
-      <div class="htitle">AI Wedding Planner</div>
-      <div class="hsub">Personalised · SG Malay Weddings</div>
-    </div>
-    <div class="pills" id="pills"></div>
-  </div>
-
-  <div class="body" id="body">
-    <div class="prog"><div class="prog-fill" id="prog" style="width:20%"></div></div>
-
-    <div id="s1">
-      <div class="slabel">Step 1 of 5</div>
-      <div class="stitle">About you both</div>
-      <div class="sdesc">The basics that personalise everything that follows.</div>
-      <div class="two">
-        <div class="field"><label>Partner 1</label><input id="p1" placeholder="e.g. Amirah"/></div>
-        <div class="field"><label>Partner 2</label><input id="p2" placeholder="e.g. Hafiz"/></div>
+    <!-- HEADER -->
+    <div class="hdr">
+      <div class="hdr-left">
+        <div class="kanji">懐く — fondly remembered</div>
+        <div class="htitle serif">AI Wedding Planner</div>
+        <div class="hsub">Personalised · SG Malay Weddings</div>
       </div>
-      <div class="two">
-        <div class="field"><label>Wedding month</label><input id="wdate" type="month"/></div>
-        <div class="field"><label>Guest count</label>
-          <select id="guests">
-            <option value="">Select range</option>
-            <option>Under 100</option><option>100 – 200</option>
-            <option>200 – 350</option><option>350 – 500</option><option>500+</option>
+      <div class="pills" id="pills"></div>
+    </div>
+
+    <!-- ── FORM ── -->
+    <div class="body" id="form-body">
+      <div class="prog"><div class="prog-fill" id="prog" style="width:20%"></div></div>
+
+      <!-- STEP 1 -->
+      <div id="s1">
+        <div class="slabel">Step 1 of 5</div>
+        <div class="stitle serif">About you both</div>
+        <div class="sdesc">The basics that personalise everything that follows.</div>
+        <div class="two">
+          <div class="field"><label>Partner 1</label><input id="p1" placeholder="e.g. Amirah"/></div>
+          <div class="field"><label>Partner 2</label><input id="p2" placeholder="e.g. Hafiz"/></div>
+        </div>
+        <div class="two">
+          <div class="field"><label>Wedding month</label><input id="wdate" type="month"/></div>
+          <div class="field"><label>Guest count</label>
+            <select id="guests">
+              <option value="">Select range</option>
+              <option>Under 100</option>
+              <option>100 – 200</option>
+              <option>200 – 350</option>
+              <option>350 – 500</option>
+              <option>500+</option>
+            </select>
+          </div>
+        </div>
+        <div class="field"><label>Area in Singapore</label>
+          <select id="area">
+            <option value="">Select region</option>
+            <option>North (Woodlands, Yishun, Sembawang)</option>
+            <option>East (Tampines, Bedok, Pasir Ris)</option>
+            <option>West (Jurong, Bukit Batok, Clementi)</option>
+            <option>Central (Bishan, Toa Payoh, Ang Mo Kio)</option>
+            <option>Heartland (any void deck or CC)</option>
+            <option>Open to any location</option>
+          </select>
+        </div>
+        <!-- API KEY (Step 1 for visibility) -->
+        <div class="field">
+          <label>Anthropic API key</label>
+          <div class="api-wrap">
+            <input id="apikey" type="password" placeholder="sk-ant-api03-…"/>
+            <button class="api-toggle" type="button" onclick="toggleKey()" id="key-toggle">show</button>
+          </div>
+          <div class="hint">
+            Your key is never stored or sent anywhere except directly to
+            <a href="https://api.anthropic.com" target="_blank" rel="noopener">api.anthropic.com</a>.
+            Get one at <a href="https://console.anthropic.com" target="_blank" rel="noopener">console.anthropic.com</a>.
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 2 -->
+      <div id="s2" style="display:none">
+        <div class="slabel">Step 2 of 5</div>
+        <div class="stitle serif">Priorities</div>
+        <div class="sdesc">Select what genuinely matters — this shapes your entire plan.</div>
+        <div class="field"><label>Must-haves</label>
+          <div class="chips" id="c-pri">
+            <div class="chip" data-v="Photography & Video">Photography & Video</div>
+            <div class="chip" data-v="Venue quality">Venue quality</div>
+            <div class="chip" data-v="Catering">Catering</div>
+            <div class="chip" data-v="Bridal look & MUA">Bridal look & MUA</div>
+            <div class="chip" data-v="Live music & Kompang">Live music & Kompang</div>
+            <div class="chip" data-v="Decor & florals">Decor & florals</div>
+            <div class="chip" data-v="Door gifts">Door gifts</div>
+            <div class="chip" data-v="Intimate atmosphere">Intimate atmosphere</div>
+            <div class="chip" data-v="Guest experience">Guest experience</div>
+          </div>
+        </div>
+        <div class="field"><label>Can live without</label>
+          <div class="chips" id="c-skip">
+            <div class="chip" data-v="Physical invitations">Physical invitations</div>
+            <div class="chip" data-v="Elaborate decor">Elaborate decor</div>
+            <div class="chip" data-v="Extended guest list">Extended guest list</div>
+            <div class="chip" data-v="Prep shots">Prep shots</div>
+            <div class="chip" data-v="Outdoor photoshoot">Outdoor photoshoot</div>
+            <div class="chip" data-v="Emcee">Emcee</div>
+            <div class="chip" data-v="Wedding cake">Wedding cake</div>
+            <div class="chip" data-v="Multiple outfit changes">Multiple outfit changes</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 3 -->
+      <div id="s3" style="display:none">
+        <div class="slabel">Step 3 of 5</div>
+        <div class="stitle serif">Budget & finances</div>
+        <div class="sdesc">Your full cash flow picture — what you spend and what you receive.</div>
+        <div class="field"><label>Total budget (SGD)</label>
+          <div class="rrow">
+            <input type="range" id="r-budget" min="5000" max="80000" step="1000" value="25000" oninput="upd('budget')"/>
+            <div class="rval" id="v-budget">$25,000</div>
+          </div>
+        </div>
+        <hr class="rule"/>
+        <div class="field"><label>Hantaran (agreed)</label>
+          <div class="rrow">
+            <input type="range" id="r-hant" min="0" max="20000" step="500" value="8000" oninput="upd('hant')"/>
+            <div class="rval" id="v-hant">$8,000</div>
+          </div>
+        </div>
+        <div class="field"><label>Est. Duit Salam</label>
+          <div class="rrow">
+            <input type="range" id="r-salam" min="0" max="10000" step="500" value="3000" oninput="upd('salam')"/>
+            <div class="rval" id="v-salam">$3,000</div>
+          </div>
+        </div>
+        <div class="field"><label>Family contributions</label>
+          <div class="rrow">
+            <input type="range" id="r-fam" min="0" max="20000" step="500" value="0" oninput="upd('fam')"/>
+            <div class="rval" id="v-fam">$0</div>
+          </div>
+        </div>
+        <div class="sum">
+          <div class="sum-lbl">Estimated out-of-pocket</div>
+          <div class="sum-val serif" id="net-cost">$14,000</div>
+          <div class="sum-note">Total budget minus all inflows</div>
+        </div>
+      </div>
+
+      <!-- STEP 4 -->
+      <div id="s4" style="display:none">
+        <div class="slabel">Step 4 of 5</div>
+        <div class="stitle serif">Style & format</div>
+        <div class="sdesc">Help us capture the feeling you are going for.</div>
+        <div class="field"><label>Venue type</label>
+          <div class="chips" id="c-venue">
+            <div class="chip" data-v="Ballroom / Hotel">Ballroom / Hotel</div>
+            <div class="chip" data-v="Heartland void deck">Heartland void deck</div>
+            <div class="chip" data-v="Boutique event space">Boutique event space</div>
+            <div class="chip" data-v="Community Centre">Community Centre</div>
+            <div class="chip" data-v="Garden / outdoor">Garden / outdoor</div>
+            <div class="chip" data-v="Not sure yet">Not sure yet</div>
+          </div>
+        </div>
+        <div class="field"><label>Overall vibe</label>
+          <div class="chips" id="c-vibe">
+            <div class="chip" data-v="Traditional & classic">Traditional & classic</div>
+            <div class="chip" data-v="Modern & minimalist">Modern & minimalist</div>
+            <div class="chip" data-v="Romantic & floral">Romantic & floral</div>
+            <div class="chip" data-v="Earthy & organic">Earthy & organic</div>
+            <div class="chip" data-v="Grand & opulent">Grand & opulent</div>
+            <div class="chip" data-v="Intimate & cosy">Intimate & cosy</div>
+          </div>
+        </div>
+        <div class="field"><label>Outfit changes</label>
+          <select id="outfits">
+            <option value="">Select</option>
+            <option>1 — Nikah only</option>
+            <option>2 — Nikah + Sanding</option>
+            <option>3 — Nikah + 2 Sanding</option>
+            <option>4+ — Full spread</option>
           </select>
         </div>
       </div>
-      <div class="field"><label>Area in Singapore</label>
-        <select id="area">
-          <option value="">Select region</option>
-          <option>North (Woodlands, Yishun, Sembawang)</option>
-          <option>East (Tampines, Bedok, Pasir Ris)</option>
-          <option>West (Jurong, Bukit Batok, Clementi)</option>
-          <option>Central (Bishan, Toa Payoh, Ang Mo Kio)</option>
-          <option>Heartland (any void deck or CC)</option>
-          <option>Open to any location</option>
-        </select>
+
+      <!-- STEP 5 -->
+      <div id="s5" style="display:none">
+        <div class="slabel">Step 5 of 5</div>
+        <div class="stitle serif">Context & concerns</div>
+        <div class="sdesc">The more you share, the more specific your plan will be.</div>
+        <div class="field"><label>Planning stage</label>
+          <select id="stage">
+            <option value="">Select</option>
+            <option>Just started — nothing booked</option>
+            <option>Early stages — shortlisting vendors</option>
+            <option>Mid-planning — some deposits paid</option>
+            <option>Late stages — finalising details</option>
+          </select>
+        </div>
+        <div class="field"><label>What do you most need help with?</label>
+          <div class="chips" id="c-help">
+            <div class="chip" data-v="Budget breakdown">Budget breakdown</div>
+            <div class="chip" data-v="Vendor strategy">Vendor strategy</div>
+            <div class="chip" data-v="Day-of itinerary">Day-of itinerary</div>
+            <div class="chip" data-v="Legal & admin steps">Legal & admin steps</div>
+            <div class="chip" data-v="Family negotiations">Family negotiations</div>
+            <div class="chip" data-v="Timeline & deadlines">Timeline & deadlines</div>
+          </div>
+        </div>
+        <div class="field"><label>Any special circumstances?</label>
+          <textarea id="notes" placeholder="e.g. Wali complications, tight timeline, large family expectations, limited photography budget…"></textarea>
+        </div>
+      </div>
+
+      <!-- NAV -->
+      <div class="nav">
+        <button class="btn btn-back" id="btn-back" onclick="prev()" style="visibility:hidden">Back</button>
+        <button class="btn btn-next" id="btn-next" onclick="next()">Next</button>
       </div>
     </div>
 
-    <div id="s2" style="display:none">
-      <div class="slabel">Step 2 of 5</div>
-      <div class="stitle">Priorities</div>
-      <div class="sdesc">Select what genuinely matters — this shapes your entire plan.</div>
-      <div class="field"><label>Must-haves</label>
-        <div class="chips" id="c-pri">
-          <div class="chip" data-v="Photography & Video">Photography & Video</div>
-          <div class="chip" data-v="Venue quality">Venue quality</div>
-          <div class="chip" data-v="Catering">Catering</div>
-          <div class="chip" data-v="Bridal look & MUA">Bridal look & MUA</div>
-          <div class="chip" data-v="Live music & Kompang">Live music & Kompang</div>
-          <div class="chip" data-v="Decor & florals">Decor & florals</div>
-          <div class="chip" data-v="Door gifts">Door gifts</div>
-          <div class="chip" data-v="Intimate atmosphere">Intimate atmosphere</div>
-          <div class="chip" data-v="Guest experience">Guest experience</div>
+    <!-- ── OUTPUT PANEL ── -->
+    <div id="output" style="display:none">
+      <div class="out-hdr">
+        <div>
+          <div class="out-names serif" id="out-names">Your Wedding Plan</div>
+          <div class="out-sub">Personalised by Natsuku AI Planner</div>
         </div>
+        <button class="btn-restart" onclick="restart()">← Start over</button>
       </div>
-      <div class="field"><label>Can live without</label>
-        <div class="chips" id="c-skip">
-          <div class="chip" data-v="Physical invitations">Physical invitations</div>
-          <div class="chip" data-v="Elaborate decor">Elaborate decor</div>
-          <div class="chip" data-v="Extended guest list">Extended guest list</div>
-          <div class="chip" data-v="Prep shots">Prep shots</div>
-          <div class="chip" data-v="Outdoor photoshoot">Outdoor photoshoot</div>
-          <div class="chip" data-v="Emcee">Emcee</div>
-          <div class="chip" data-v="Wedding cake">Wedding cake</div>
-          <div class="chip" data-v="Multiple outfit changes">Multiple outfit changes</div>
+      <div class="out-body">
+        <div class="loading" id="loading">
+          <div class="spinner"></div>
+          <div class="load-txt" id="load-msg">Crafting your personalised plan…</div>
+        </div>
+        <div class="plan" id="plan-out" style="display:none"></div>
+        <div class="err-box" id="err-box" style="display:none">
+          <p id="err-msg">Something went wrong.</p>
+          <code id="err-detail"></code>
+        </div>
+        <div id="print-btn-wrap" style="display:none;margin-top:24px;text-align:right">
+          <button class="btn btn-next" onclick="window.print()" style="font-size:10px;padding:9px 20px">Print / Save PDF</button>
         </div>
       </div>
     </div>
 
-    <div id="s3" style="display:none">
-      <div class="slabel">Step 3 of 5</div>
-      <div class="stitle">Budget & finances</div>
-      <div class="sdesc">Your full cash flow picture — what you spend and what you receive.</div>
-      <div class="field"><label>Total budget (SGD)</label>
-        <div class="rrow">
-          <input type="range" id="r-budget" min="5000" max="80000" step="1000" value="25000" oninput="upd('budget')"/>
-          <div class="rval" id="v-budget">$25,000</div>
-        </div>
-      </div>
-      <hr class="rule"/>
-      <div class="field"><label>Hantaran (agreed)</label>
-        <div class="rrow">
-          <input type="range" id="r-hant" min="0" max="20000" step="500" value="8000" oninput="upd('hant')"/>
-          <div class="rval" id="v-hant">$8,000</div>
-        </div>
-      </div>
-      <div class="field"><label>Est. Duit Salam</label>
-        <div class="rrow">
-          <input type="range" id="r-salam" min="0" max="10000" step="500" value="3000" oninput="upd('salam')"/>
-          <div class="rval" id="v-salam">$3,000</div>
-        </div>
-      </div>
-      <div class="field"><label>Family contributions</label>
-        <div class="rrow">
-          <input type="range" id="r-fam" min="0" max="20000" step="500" value="0" oninput="upd('fam')"/>
-          <div class="rval" id="v-fam">$0</div>
-        </div>
-      </div>
-      <div class="sum">
-        <div class="sum-label">Estimated out-of-pocket</div>
-        <div class="sum-val" id="net-cost">$14,000</div>
-        <div class="sum-note">Total budget minus all inflows</div>
-      </div>
-    </div>
+  </div><!-- /card -->
 
-    <div id="s4" style="display:none">
-      <div class="slabel">Step 4 of 5</div>
-      <div class="stitle">Style & format</div>
-      <div class="sdesc">Help us capture the feeling you are going for.</div>
-      <div class="field"><label>Venue type</label>
-        <div class="chips" id="c-venue">
-          <div class="chip" data-v="Ballroom / Hotel">Ballroom / Hotel</div>
-          <div class="chip" data-v="Heartland void deck">Heartland void deck</div>
-          <div class="chip" data-v="Boutique event space">Boutique event space</div>
-          <div class="chip" data-v="Community Centre">Community Centre</div>
-          <div class="chip" data-v="Garden / outdoor">Garden / outdoor</div>
-          <div class="chip" data-v="Not sure yet">Not sure yet</div>
-        </div>
-      </div>
-      <div class="field"><label>Overall vibe</label>
-        <div class="chips" id="c-vibe">
-          <div class="chip" data-v="Traditional & classic">Traditional & classic</div>
-          <div class="chip" data-v="Modern & minimalist">Modern & minimalist</div>
-          <div class="chip" data-v="Romantic & floral">Romantic & floral</div>
-          <div class="chip" data-v="Earthy & organic">Earthy & organic</div>
-          <div class="chip" data-v="Grand & opulent">Grand & opulent</div>
-          <div class="chip" data-v="Intimate & cosy">Intimate & cosy</div>
-        </div>
-      </div>
-      <div class="field"><label>Outfit changes</label>
-        <select id="outfits">
-          <option value="">Select</option>
-          <option>1 — Nikah only</option>
-          <option>2 — Nikah + Sanding</option>
-          <option>3 — Nikah + 2 Sanding</option>
-          <option>4+ — Full spread</option>
-        </select>
-      </div>
-    </div>
-
-    <div id="s5" style="display:none">
-      <div class="slabel">Step 5 of 5</div>
-      <div class="stitle">Context & concerns</div>
-      <div class="sdesc">The more you share, the more specific your plan will be.</div>
-      <div class="field"><label>Planning stage</label>
-        <select id="stage">
-          <option value="">Select</option>
-          <option>Just started — nothing booked</option>
-          <option>Early stages — shortlisting vendors</option>
-          <option>Mid-planning — some deposits paid</option>
-          <option>Late stages — finalising details</option>
-        </select>
-      </div>
-      <div class="field"><label>What do you most need help with?</label>
-        <div class="chips" id="c-help">
-          <div class="chip" data-v="Budget breakdown">Budget breakdown</div>
-          <div class="chip" data-v="Vendor strategy">Vendor strategy</div>
-          <div class="chip" data-v="Day-of itinerary">Day-of itinerary</div>
-          <div class="chip" data-v="Legal & admin steps">Legal & admin steps</div>
-          <div class="chip" data-v="Family negotiations">Family negotiations</div>
-          <div class="chip" data-v="Timeline & deadlines">Timeline & deadlines</div>
-        </div>
-      </div>
-      <div class="field"><label>Any special circumstances?</label>
-        <textarea id="notes" placeholder="e.g. Wali complications, tight timeline, large family expectations, limited photography budget..."></textarea>
-      </div>
-    </div>
-
-    <div class="nav">
-      <button class="btn btn-back" id="btn-back" onclick="prev()" style="visibility:hidden">Back</button>
-      <button class="btn btn-next" id="btn-next" onclick="next()">Next</button>
-    </div>
+  <div class="footer">
+    <a href="https://instagram.com/natsuku.co" target="_blank" rel="noopener">@natsuku.co</a>
+    &nbsp;·&nbsp; Wedding Photography &nbsp;·&nbsp; Singapore
   </div>
-</div>
+</div><!-- /page -->
 
 <script>
-let step=1,total=5;
-const sel={pri:[],skip:[],venue:[],vibe:[],help:[]};
+// ── STATE ─────────────────────────────────────────────────────────
+let step = 1;
+const TOTAL = 5;
+const sel = { pri:[], skip:[], venue:[], vibe:[], help:[] };
 
-function initPills(){
-  const c=document.getElementById('pills');
-  for(let i=1;i<=total;i++){
-    const d=document.createElement('div');
-    d.className='pill'+(i===1?' active':'');
-    d.id='pl'+i;d.textContent=i;c.appendChild(d);
+// ── PILLS ─────────────────────────────────────────────────────────
+(function initPills(){
+  const c = document.getElementById('pills');
+  for (let i = 1; i <= TOTAL; i++) {
+    const d = document.createElement('div');
+    d.className = 'pill' + (i === 1 ? ' active' : '');
+    d.id = 'pl' + i;
+    d.textContent = i;
+    c.appendChild(d);
   }
-}
-initPills();
+})();
 
-function chips(gid,key){
-  document.querySelectorAll('#'+gid+' .chip').forEach(c=>{
-    c.addEventListener('click',()=>{
+// ── CHIPS ─────────────────────────────────────────────────────────
+function initChips(gid, key) {
+  document.querySelectorAll('#' + gid + ' .chip').forEach(c => {
+    c.addEventListener('click', () => {
       c.classList.toggle('sel');
-      const v=c.dataset.v,i=sel[key].indexOf(v);
-      if(i>-1)sel[key].splice(i,1);else sel[key].push(v);
+      const v = c.dataset.v;
+      const i = sel[key].indexOf(v);
+      if (i > -1) sel[key].splice(i, 1); else sel[key].push(v);
     });
   });
 }
-chips('c-pri','pri');chips('c-skip','skip');
-chips('c-venue','venue');chips('c-vibe','vibe');chips('c-help','help');
+initChips('c-pri','pri'); initChips('c-skip','skip');
+initChips('c-venue','venue'); initChips('c-vibe','vibe'); initChips('c-help','help');
 
-function fmt(v){return '$'+Number(v).toLocaleString();}
+// ── RANGES ────────────────────────────────────────────────────────
+function fmt(v) { return '$' + Number(v).toLocaleString(); }
 
-function calcNet(){
-  const b=+document.getElementById('r-budget').value;
-  const h=+document.getElementById('r-hant').value;
-  const s=+document.getElementById('r-salam').value;
-  const f=+document.getElementById('r-fam').value;
-  const net=Math.max(0,b-h-s-f);
-  document.getElementById('net-cost').textContent=fmt(net);
+function calcNet() {
+  const net = Math.max(0,
+    +document.getElementById('r-budget').value -
+    +document.getElementById('r-hant').value -
+    +document.getElementById('r-salam').value -
+    +document.getElementById('r-fam').value
+  );
+  document.getElementById('net-cost').textContent = fmt(net);
 }
 
-function upd(id){
-  const v=document.getElementById('r-'+id).value;
-  document.getElementById('v-'+id).textContent=fmt(v);
+function upd(id) {
+  document.getElementById('v-' + id).textContent = fmt(document.getElementById('r-' + id).value);
   calcNet();
 }
 
-function ui(){
-  const pct=(step/total)*100;
-  document.getElementById('prog').style.width=pct+'%';
-  for(let i=1;i<=total;i++){
-    const p=document.getElementById('pl'+i);
-    p.className='pill'+(i<step?' done':i===step?' active':'');
+// ── API KEY TOGGLE ────────────────────────────────────────────────
+function toggleKey() {
+  const inp = document.getElementById('apikey');
+  const btn = document.getElementById('key-toggle');
+  if (inp.type === 'password') { inp.type = 'text'; btn.textContent = 'hide'; }
+  else { inp.type = 'password'; btn.textContent = 'show'; }
+}
+
+// ── NAVIGATION ────────────────────────────────────────────────────
+function updateUI() {
+  document.getElementById('prog').style.width = ((step / TOTAL) * 100) + '%';
+  for (let i = 1; i <= TOTAL; i++) {
+    document.getElementById('pl' + i).className =
+      'pill' + (i < step ? ' done' : i === step ? ' active' : '');
   }
-  document.getElementById('btn-back').style.visibility=step>1?'visible':'hidden';
-  const nb=document.getElementById('btn-next');
-  if(step===total){
-    nb.textContent='Generate my plan \u2197';
-    nb.className='btn btn-gen';
-  }else{
-    nb.textContent='Next';
-    nb.className='btn btn-next';
+  document.getElementById('btn-back').style.visibility = step > 1 ? 'visible' : 'hidden';
+  const nb = document.getElementById('btn-next');
+  if (step === TOTAL) {
+    nb.textContent = 'Generate my plan →';
+    nb.className = 'btn btn-gen';
+  } else {
+    nb.textContent = 'Next';
+    nb.className = 'btn btn-next';
   }
 }
 
-function show(n){
-  for(let i=1;i<=total;i++)
-    document.getElementById('s'+i).style.display=i===n?'block':'none';
+function showStep(n) {
+  for (let i = 1; i <= TOTAL; i++)
+    document.getElementById('s' + i).style.display = i === n ? 'block' : 'none';
 }
 
-function next(){
-  if(step<total){step++;show(step);ui();}
+function next() {
+  if (step < TOTAL) { step++; showStep(step); updateUI(); }
   else generate();
 }
-function prev(){if(step>1){step--;show(step);ui();}}
 
-function generate(){
-  const p1=document.getElementById('p1').value||'Partner 1';
-  const p2=document.getElementById('p2').value||'Partner 2';
-  const wdate=document.getElementById('wdate').value;
-  const guests=document.getElementById('guests').value;
-  const area=document.getElementById('area').value;
-  const budget=document.getElementById('r-budget').value;
-  const hant=document.getElementById('r-hant').value;
-  const salam=document.getElementById('r-salam').value;
-  const fam=document.getElementById('r-fam').value;
-  const net=Math.max(0,+budget-+hant-+salam-+fam);
-  const outfits=document.getElementById('outfits').value;
-  const stage=document.getElementById('stage').value;
-  const notes=document.getElementById('notes').value;
+function prev() {
+  if (step > 1) { step--; showStep(step); updateUI(); }
+}
 
-  const msg=`Please generate a full personalised SG Malay wedding plan for this couple using the WEDDING PLANNER DATA below. Follow the exact output format specified.
+function restart() {
+  step = 1; showStep(1); updateUI();
+  document.getElementById('form-body').style.display = 'block';
+  document.getElementById('output').style.display = 'none';
+  document.getElementById('plan-out').innerHTML = '';
+  document.getElementById('plan-out').style.display = 'none';
+  document.getElementById('loading').style.display = 'block';
+  document.getElementById('err-box').style.display = 'none';
+  document.getElementById('print-btn-wrap').style.display = 'none';
+}
 
----WEDDING PLANNER DATA---
+updateUI();
+
+// ── PROMPT BUILDER ────────────────────────────────────────────────
+function buildPrompt() {
+  const p1     = document.getElementById('p1').value     || 'Partner 1';
+  const p2     = document.getElementById('p2').value     || 'Partner 2';
+  const wdate  = document.getElementById('wdate').value  || 'Not yet set';
+  const guests = document.getElementById('guests').value || 'Not specified';
+  const area   = document.getElementById('area').value   || 'Not specified';
+  const budget = document.getElementById('r-budget').value;
+  const hant   = document.getElementById('r-hant').value;
+  const salam  = document.getElementById('r-salam').value;
+  const fam    = document.getElementById('r-fam').value;
+  const net    = Math.max(0, +budget - +hant - +salam - +fam);
+  const outfits= document.getElementById('outfits').value || 'Not specified';
+  const stage  = document.getElementById('stage').value  || 'Not specified';
+  const notes  = document.getElementById('notes').value  || 'None';
+
+  return `You are an expert Singapore Malay wedding planner. Generate a full personalised wedding plan using the data below. Be warm, direct, and SG-specific. Use concrete SGD amounts and real dates. Use markdown tables where helpful.
+
+---COUPLE DATA---
 Couple: ${p1} & ${p2}
-Wedding date: ${wdate||'Not yet set'}
-Guest count: ${guests||'Not specified'}
-Location: ${area||'Not specified'}
-Must-haves: ${sel.pri.length?sel.pri.join(', '):'Not specified'}
-Can live without: ${sel.skip.length?sel.skip.join(', '):'Not specified'}
-Venue preference: ${sel.venue.length?sel.venue.join(', '):'Not specified'}
-Vibe: ${sel.vibe.length?sel.vibe.join(', '):'Not specified'}
-Outfit changes: ${outfits||'Not specified'}
+Wedding date: ${wdate}
+Guest count: ${guests}
+Location: ${area}
+Must-haves: ${sel.pri.length ? sel.pri.join(', ') : 'Not specified'}
+Can live without: ${sel.skip.length ? sel.skip.join(', ') : 'Not specified'}
+Venue preference: ${sel.venue.length ? sel.venue.join(', ') : 'Not specified'}
+Vibe: ${sel.vibe.length ? sel.vibe.join(', ') : 'Not specified'}
+Outfit changes: ${outfits}
 Total budget: ${fmt(budget)}
 Hantaran: ${fmt(hant)}
 Est. Duit Salam: ${fmt(salam)}
 Family contributions: ${fmt(fam)}
 Out-of-pocket estimate: ${fmt(net)}
-Planning stage: ${stage||'Not specified'}
-Needs most help with: ${sel.help.length?sel.help.join(', '):'General planning'}
-Special circumstances: ${notes||'None'}
+Planning stage: ${stage}
+Needs most help with: ${sel.help.length ? sel.help.join(', ') : 'General planning'}
+Special circumstances: ${notes}
 ---END DATA---
 
-Output format — use these exact headings:
+Use EXACTLY these headings in this order:
 ## Financial overview
 ## Budget allocation
 ## Priority assessment
 ## Action checklist (month by month)
 ## Day-of itinerary
 ## Vendor strategy
-## One honest note
-
-Keep the tone warm, direct, and SG-specific. Be concrete with dollar amounts and dates.`;
-
-  sendPrompt(msg);
+## One honest note`;
 }
 
-ui();
+// ── MARKDOWN RENDERER ─────────────────────────────────────────────
+function renderMd(md) {
+  // tables
+  md = md.replace(/\|(.+)\|\n\|[-| ]+\|\n((?:\|.+\|\n?)*)/g, (_, hdr, body) => {
+    const ths = hdr.split('|').filter(c => c.trim()).map(c => `<th>${c.trim()}</th>`).join('');
+    const trs = body.trim().split('\n').map(row => {
+      const tds = row.split('|').filter(c => c.trim()).map(c => `<td>${c.trim()}</td>`).join('');
+      return `<tr>${tds}</tr>`;
+    }).join('');
+    return `<table><thead><tr>${ths}</tr></thead><tbody>${trs}</tbody></table>`;
+  });
+  // headings
+  md = md.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+  md = md.replace(/^### (.+)$/gm, '<h3>$1</h3>');
+  // inline
+  md = md.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  md = md.replace(/\*(.+?)\*/g, '<em>$1</em>');
+  // blockquotes → note box
+  md = md.replace(/^> (.+)$/gm, '<div class="note-box"><p>$1</p></div>');
+  // bullets
+  md = md.replace(/^[-*] (.+)$/gm, '<li>$1</li>');
+  md = md.replace(/(<li>[\s\S]+?<\/li>\n?)+/g, m => `<ul>${m}</ul>`);
+  // numbered lists
+  md = md.replace(/^\d+\. (.+)$/gm, '<li>$1</li>');
+  // paragraphs — wrap bare lines
+  md = md.split('\n\n').map(block => {
+    if (/^<[htud]/.test(block.trim())) return block;
+    return `<p>${block.trim()}</p>`;
+  }).join('\n');
+  return md;
+}
+
+// ── GENERATE ─────────────────────────────────────────────────────
+async function generate() {
+  const apiKey = document.getElementById('apikey').value.trim();
+  if (!apiKey) {
+    alert('Please enter your Anthropic API key in Step 1 to generate your plan.');
+    step = 1; showStep(1); updateUI(); return;
+  }
+
+  const p1 = document.getElementById('p1').value || 'Partner 1';
+  const p2 = document.getElementById('p2').value || 'Partner 2';
+
+  // switch to output panel
+  document.getElementById('form-body').style.display = 'none';
+  document.getElementById('output').style.display = 'block';
+  document.getElementById('out-names').textContent = p1 + ' & ' + p2;
+  document.getElementById('loading').style.display = 'block';
+  document.getElementById('plan-out').style.display = 'none';
+  document.getElementById('err-box').style.display = 'none';
+  document.getElementById('print-btn-wrap').style.display = 'none';
+
+  // cycling loading messages
+  const msgs = [
+    'Crafting your personalised plan…',
+    'Mapping your priorities…',
+    'Calculating your budget framework…',
+    'Building your itinerary…',
+    'Almost there…'
+  ];
+  let mi = 0;
+  const msgEl = document.getElementById('load-msg');
+  const ticker = setInterval(() => { mi = (mi + 1) % msgs.length; msgEl.textContent = msgs[mi]; }, 2400);
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 2048,
+        messages: [{ role: 'user', content: buildPrompt() }]
+      })
+    });
+
+    clearInterval(ticker);
+
+    if (!resp.ok) {
+      let detail = '';
+      try { const e = await resp.json(); detail = e.error?.message || JSON.stringify(e); } catch(_) {}
+      throw new Error(`API error ${resp.status}: ${detail}`);
+    }
+
+    const data = await resp.json();
+    const text = (data.content || []).filter(b => b.type === 'text').map(b => b.text).join('');
+
+    document.getElementById('loading').style.display = 'none';
+    const out = document.getElementById('plan-out');
+    out.innerHTML = renderMd(text);
+    out.style.display = 'block';
+    document.getElementById('print-btn-wrap').style.display = 'block';
+
+  } catch (err) {
+    clearInterval(ticker);
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('err-box').style.display = 'block';
+    document.getElementById('err-msg').textContent =
+      'Could not generate your plan. Check your API key and try again.';
+    document.getElementById('err-detail').textContent = err.message;
+  }
+}
 </script>
+</body>
+</html>

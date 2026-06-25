@@ -8,8 +8,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <title>懐く Wedding Planner</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet"/>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 :root{
   --forest:#3F4F46; --cream:#F4EEDC; --parchment:#F1EDDD;
@@ -217,6 +216,14 @@ main{padding:.75rem .85rem 1rem;max-width:640px;margin:0 auto}
 .itin-edit-fields{margin-top:.5rem;display:none;border-top:1px solid var(--border);padding-top:.5rem;gap:.4rem;flex-direction:column}
 .itin-row.open .itin-edit-fields{display:flex}
 .itin-row-actions{display:flex;gap:.4rem;align-items:center;margin-top:.4rem}
+.itin-drag-handle{
+  cursor:grab;color:var(--tm);font-size:.9rem;padding:.2rem .4rem;
+  touch-action:none;user-select:none;opacity:.4;transition:opacity .15s;
+  display:flex;align-items:center;min-height:36px;
+}
+.itin-drag-handle:active{cursor:grabbing;opacity:.7}
+.itin-row.dragging{opacity:.4;border-style:dashed}
+.itin-row.drag-over{border-top:2.5px solid var(--sienna)}
 /* ── BUDGET ─────────────────────────────── */
 .budget-item{
   background:var(--cream);border:1px solid var(--border);
@@ -508,7 +515,7 @@ hr.div{border:none;border-top:1px solid var(--border);margin:.75rem 0}
     <div class="kanji">fondly remembered · natsuku</div>
   </div>
   <div style="display:flex;gap:.5rem;align-items:center;">
-    <button class="btn-save" onclick="downloadPDF()" style="background:rgba(161,130,107,.25);letter-spacing:.1em;">⬇ PDF</button>
+    <button class="btn-save" onclick="downloadExcel()" style="background:rgba(161,130,107,.25);letter-spacing:.1em;">⬇ Excel</button>
     <button class="btn-save" onclick="saveAll()">
       <span class="save-dot"></span>Save
     </button>
@@ -607,13 +614,13 @@ hr.div{border:none;border-top:1px solid var(--border);margin:.75rem 0}
     <div class="progress-track"><div class="progress-fill" id="checkBar" style="width:0%"></div></div>
   </div>
   <div id="checklistCt"></div>
-  <div class="action-row">
-    <button class="btn secondary" onclick="addCustomTask()">+ Custom Task</button>
-  </div>
 </div>
 <!-- ═══ PANE 2: ITINERARY ═══ -->
 <div class="pane" id="pane-2">
   <div class="sec-head"><h2><em>Itinerary</em></h2><p>Day-of timeline</p></div>
+  <div class="info-block forest" style="margin-bottom:.85rem">
+    This itinerary is fully editable — tap any event to edit its details, and drag the ⠿ handle to reorder the sequence.
+  </div>
   <div id="itinList"></div>
   <div class="action-row">
     <button class="btn secondary full" onclick="addItinRow()">+ Add Event</button>
@@ -780,7 +787,7 @@ Timetable with MOH / Best Man</textarea></div>
     <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.2rem;color:var(--forest);margin-bottom:.3rem">to be fondly remembered</div>
     <div style="font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;color:var(--tm)">May your celebration be cherished — Natsuku</div>
     <div class="action-row" style="justify-content:center;margin-top:1rem">
-      <button class="btn" onclick="downloadPDF()">⬇ Export PDF</button>
+      <button class="btn" onclick="downloadExcel()">⬇ Export Excel</button>
     </div>
   </div>
 </div>
@@ -830,7 +837,7 @@ Timetable with MOH / Best Man</textarea></div>
   </button>
 </nav>
 <div class="toast" id="toast">Saved ✓</div>
-<div class="overlay" id="overlay"><div class="overlay-text" id="overlayText">Generating PDF…</div></div>
+<div class="overlay" id="overlay"><div class="overlay-text" id="overlayText">Generating Excel…</div></div>
 <script>
 'use strict';
 /* ═══════════════════════ STATE ═══════════════════════ */
@@ -1057,6 +1064,7 @@ function initChecklist() {
   TASKS.forEach((group,gi)=>{
     const g = document.createElement('div');
     g.className='check-group';
+    g.dataset.gi = gi;
     g.innerHTML=`<div class="check-group-title">${group.group}</div>`;
     group.items.forEach((item,ii)=>{
       const row=document.createElement('div');
@@ -1071,6 +1079,11 @@ function initChecklist() {
         </div>`;
       g.appendChild(row);
     });
+    const addBtn = document.createElement('div');
+    addBtn.className = 'action-row';
+    addBtn.style.cssText = 'margin-top:.3rem;margin-bottom:.3rem';
+    addBtn.innerHTML = `<button class="btn secondary" onclick="addCustomTask(${gi})" style="padding:.4rem .8rem;font-size:.6rem">+ Custom Task</button>`;
+    g.appendChild(addBtn);
     el.appendChild(g);
   });
   updateCheckProgress();
@@ -1083,10 +1096,11 @@ function updateCheckProgress() {
   document.getElementById('checkLabel').textContent=`${done.length} of ${all.length} tasks`;
   document.getElementById('checkPct').textContent=pct+'%';
 }
-function addCustomTask() {
+function addCustomTask(gi) {
   const name=prompt('Task name:'); if(!name) return;
   const tip=prompt('Tip (optional):')||'';
-  const g=document.querySelector('#checklistCt .check-group:last-child');
+  const g=document.querySelector(`#checklistCt .check-group[data-gi="${gi}"]`);
+  if(!g) return;
   const id='chk-custom-'+Date.now();
   const row=document.createElement('div');
   row.className='check-item';
@@ -1096,7 +1110,8 @@ function addCustomTask() {
       <label for="${id}" class="check-item-name">${name}</label>
       ${tip?`<div class="check-item-tip">${tip}</div>`:''}
     </div>`;
-  g.appendChild(row);
+  const addBtnRow = g.querySelector('.action-row');
+  g.insertBefore(row, addBtnRow);
   updateCheckProgress();
 }
 /* ═══════════════════════ ITINERARY ══════════════════ */
@@ -1130,11 +1145,14 @@ function renderItin() {
     const pm=PART_MAP[row.part]||PART_MAP.prep;
     const div=document.createElement('div');
     div.className='itin-row';
+    div.draggable=true;
+    div.dataset.idx=i;
     div.innerHTML=`
-      <div class="itin-row-top" onclick="toggleItin(this.closest('.itin-row'))">
-        <span class="itin-time">${row.time||'—'}</span>
-        <span class="itin-part ${pm.c}">${pm.l}</span>
-        <span style="font-size:.68rem;color:var(--tm);margin-left:auto">${row.dur||''}</span>
+      <div class="itin-row-top">
+        <span class="itin-drag-handle" title="Drag to reorder">⠿</span>
+        <span class="itin-time" onclick="toggleItin(this.closest('.itin-row'))">${row.time||'—'}</span>
+        <span class="itin-part ${pm.c}" onclick="toggleItin(this.closest('.itin-row'))">${pm.l}</span>
+        <span style="font-size:.68rem;color:var(--tm);margin-left:auto" onclick="toggleItin(this.closest('.itin-row'))">${row.dur||''}</span>
       </div>
       <div class="itin-event" onclick="toggleItin(this.closest('.itin-row'))">${row.event||'Untitled event'}</div>
       ${row.vendor?`<div class="itin-vendor">${row.vendor}</div>`:''}
@@ -1157,7 +1175,75 @@ function renderItin() {
           <button class="btn danger btn-sm" onclick="S.itinRows.splice(${i},1);renderItin()">Remove</button>
         </div>
       </div>`;
+    div.addEventListener('dragstart', itinDragStart);
+    div.addEventListener('dragover', itinDragOver);
+    div.addEventListener('dragleave', itinDragLeave);
+    div.addEventListener('drop', itinDrop);
+    div.addEventListener('dragend', itinDragEnd);
+    initItinTouch(div);
     el.appendChild(div);
+  });
+}
+let itinDragIdx=null;
+function itinDragStart(e){
+  itinDragIdx=+this.dataset.idx;
+  this.classList.add('dragging');
+  e.dataTransfer.effectAllowed='move';
+}
+function itinDragOver(e){
+  e.preventDefault();
+  e.dataTransfer.dropEffect='move';
+  this.classList.add('drag-over');
+}
+function itinDragLeave(){this.classList.remove('drag-over');}
+function itinDrop(e){
+  e.preventDefault();
+  this.classList.remove('drag-over');
+  const to=+this.dataset.idx;
+  if(itinDragIdx!==null&&itinDragIdx!==to){
+    const item=S.itinRows.splice(itinDragIdx,1)[0];
+    S.itinRows.splice(to,0,item);
+    renderItin();
+  }
+}
+function itinDragEnd(){itinDragIdx=null;document.querySelectorAll('.itin-row').forEach(r=>{r.classList.remove('dragging','drag-over');});}
+function initItinTouch(el){
+  const handle=el.querySelector('.itin-drag-handle');
+  if(!handle) return;
+  let startY,startIdx,clone,rows,placeholder;
+  handle.addEventListener('touchstart',function(e){
+    e.preventDefault();
+    startIdx=+el.dataset.idx;
+    startY=e.touches[0].clientY;
+    clone=el.cloneNode(true);
+    clone.style.cssText='position:fixed;left:0;right:0;z-index:999;opacity:.85;pointer-events:none;box-shadow:0 4px 20px rgba(0,0,0,.2);';
+    clone.style.top=el.getBoundingClientRect().top+'px';
+    document.body.appendChild(clone);
+    el.classList.add('dragging');
+    rows=[...document.querySelectorAll('.itin-row')];
+  },{passive:false});
+  handle.addEventListener('touchmove',function(e){
+    if(!clone) return;
+    e.preventDefault();
+    const y=e.touches[0].clientY;
+    clone.style.top=(el.getBoundingClientRect().top+(y-startY))+'px';
+    rows.forEach(r=>{
+      const rect=r.getBoundingClientRect();
+      r.classList.toggle('drag-over',y>rect.top&&y<rect.bottom&&r!==el);
+    });
+  },{passive:false});
+  handle.addEventListener('touchend',function(){
+    if(!clone) return;
+    clone.remove();clone=null;
+    el.classList.remove('dragging');
+    const target=rows.find(r=>r.classList.contains('drag-over'));
+    rows.forEach(r=>r.classList.remove('drag-over'));
+    if(target){
+      const to=+target.dataset.idx;
+      const item=S.itinRows.splice(startIdx,1)[0];
+      S.itinRows.splice(to,0,item);
+      renderItin();
+    }
   });
 }
 function toggleItin(row) { row.classList.toggle('open'); }
@@ -1167,57 +1253,57 @@ const BUDGET_CATEGORIES = [
   {
     cat: '🏛 Venue & Catering',
     items: [
-      {item:'Venue Rental',alloc:8000,actual:0,status:'pending'},
-      {item:'Catering & Food',alloc:4000,actual:0,status:'pending'},
+      {item:'Venue Rental',alloc:0,actual:0,status:'pending'},
+      {item:'Catering & Food',alloc:0,actual:0,status:'pending'},
     ]
   },
   {
     cat: '📸 Media & Entertainment',
     items: [
-      {item:'Photography',alloc:2500,actual:0,status:'pending'},
-      {item:'Videography',alloc:1500,actual:0,status:'pending'},
-      {item:'Emcee',alloc:500,actual:0,status:'pending'},
-      {item:'Kompang',alloc:400,actual:0,status:'optional'},
+      {item:'Photography',alloc:0,actual:0,status:'pending'},
+      {item:'Videography',alloc:0,actual:0,status:'pending'},
+      {item:'Emcee',alloc:0,actual:0,status:'pending'},
+      {item:'Kompang',alloc:0,actual:0,status:'optional'},
     ]
   },
   {
     cat: '👗 Attire & Beauty',
     items: [
-      {item:'Bridal Attire (Bride)',alloc:3000,actual:0,status:'pending'},
-      {item:'Groom Attire',alloc:800,actual:0,status:'pending'},
-      {item:'MUA — Bride',alloc:800,actual:0,status:'pending'},
-      {item:'MUA — Groom',alloc:300,actual:0,status:'pending'},
-      {item:'Henna Artist',alloc:250,actual:0,status:'optional'},
+      {item:'Bridal Attire (Bride)',alloc:0,actual:0,status:'pending'},
+      {item:'Groom Attire',alloc:0,actual:0,status:'pending'},
+      {item:'MUA — Bride',alloc:0,actual:0,status:'pending'},
+      {item:'MUA — Groom',alloc:0,actual:0,status:'pending'},
+      {item:'Henna Artist',alloc:0,actual:0,status:'optional'},
     ]
   },
   {
     cat: '💍 Ceremony & Traditions',
     items: [
-      {item:'Nikah Registration & Duit Salam Kadi',alloc:250,actual:0,status:'pending'},
-      {item:'Wedding Rings',alloc:2000,actual:0,status:'pending'},
-      {item:'Hantaran / Dulang',alloc:500,actual:0,status:'pending'},
+      {item:'Nikah Registration & Duit Salam Kadi',alloc:0,actual:0,status:'pending'},
+      {item:'Wedding Rings',alloc:0,actual:0,status:'pending'},
+      {item:'Hantaran / Dulang',alloc:0,actual:0,status:'pending'},
     ]
   },
   {
     cat: '🎁 Guests & Decor',
     items: [
-      {item:'Florals & Decor',alloc:800,actual:0,status:'pending'},
-      {item:'Invitation Cards',alloc:300,actual:0,status:'pending'},
-      {item:'Door Gifts',alloc:600,actual:0,status:'pending'},
-      {item:'Wedding Cake',alloc:400,actual:0,status:'pending'},
+      {item:'Florals & Decor',alloc:0,actual:0,status:'pending'},
+      {item:'Invitation Cards',alloc:0,actual:0,status:'pending'},
+      {item:'Door Gifts',alloc:0,actual:0,status:'pending'},
+      {item:'Wedding Cake',alloc:0,actual:0,status:'pending'},
     ]
   },
   {
     cat: '🚗 Logistics',
     items: [
-      {item:'Transportation',alloc:300,actual:0,status:'pending'},
+      {item:'Transportation',alloc:0,actual:0,status:'pending'},
     ]
   },
   {
     cat: '✈️ Post-Wedding',
     items: [
-      {item:'Honeymoon',alloc:2000,actual:0,status:'pending'},
-      {item:'Miscellaneous Buffer',alloc:500,actual:0,status:'pending'},
+      {item:'Honeymoon',alloc:0,actual:0,status:'pending'},
+      {item:'Miscellaneous Buffer',alloc:0,actual:0,status:'pending'},
     ]
   },
 ];
@@ -1485,68 +1571,138 @@ function addPartyMember() {
   S.partyMembers.push({name:'',role:'Bridesmaid',duties:''});
   renderParty();
 }
-/* ═══════════════════════ PDF ════════════════════════ */
-async function downloadPDF() {
+/* ═══════════════════════ EXCEL EXPORT ════════════════ */
+function downloadExcel() {
   const ov=document.getElementById('overlay');
   const ot=document.getElementById('overlayText');
+  ot.textContent='Generating Excel…';
   ov.classList.add('show');
   try {
-    const {jsPDF}=window.jspdf;
-    const pdf=new jsPDF({unit:'mm',format:'a4',orientation:'portrait'});
-    const p1=v('p1')||'Partner 1', p2=v('p2')||'Partner 2';
+    const wb=XLSX.utils.book_new();
+    const p1n=v('p1')||'Partner 1', p2n=v('p2')||'Partner 2';
     const wDate=v('wDate'), venue=v('wVenue');
-    const panes=document.querySelectorAll('.pane');
-    const sections=[
-      'Overview','Checklist','Itinerary','Budget','Vendors','Outfits & Beauty','Roles','Notes'
+
+    // Overview sheet
+    const overviewData=[
+      ['Natsuku Wedding Planner'],
+      [],
+      ['Partner 1',p1n],
+      ['Partner 2',p2n],
+      ['Wedding Date',wDate],
+      ['Venue',venue],
+      ['Total Budget',v('totalBudget')?+v('totalBudget'):''],
+      ['Guest Count',v('guestCount')?+v('guestCount'):''],
+      [],
+      ['Priority Matrix'],
+      ['Item','Priority Level'],
     ];
-    panes.forEach(p=>{p.style.display='block';p.style.opacity='1';});
-    let first=true;
-    for(let i=0;i<panes.length;i++){
-      ot.textContent=`Exporting ${sections[i]}…`;
-      const canvas=await html2canvas(panes[i],{scale:1.4,useCORS:true,backgroundColor:'#F4EEDC',scrollX:0,scrollY:0,windowWidth:640});
-      const imgData=canvas.toDataURL('image/jpeg',0.85);
-      const pageW=210,pageH=297;
-      const imgH=(canvas.height*pageW)/canvas.width;
-      if(!first) pdf.addPage(); first=false;
-      pdf.setFillColor(63,79,70); pdf.rect(0,0,pageW,20,'F');
-      pdf.setTextColor(244,238,220); pdf.setFontSize(12); pdf.setFont('helvetica','italic');
-      pdf.text('Natsuku Wedding Planner',10,9);
-      pdf.setFontSize(6.5); pdf.setFont('helvetica','normal');
-      pdf.text(`${p1} & ${p2}`,10,15);
-      if(wDate) pdf.text(wDate,95,15);
-      if(venue) pdf.text(venue,145,15);
-      pdf.text(sections[i],pageW-10,9,{align:'right'});
-      const contentY=23, availH=pageH-contentY-8;
-      if(imgH<=availH){ pdf.addImage(imgData,'JPEG',4,contentY,pageW-8,imgH); }
-      else {
-        let yOff=0; const sc=(pageW-8)/canvas.width;
-        while(yOff<canvas.height){
-          if(yOff>0){
-            pdf.addPage();
-            pdf.setFillColor(63,79,70); pdf.rect(0,0,pageW,20,'F');
-            pdf.setTextColor(244,238,220); pdf.setFontSize(12); pdf.setFont('helvetica','italic');
-            pdf.text('Natsuku Wedding Planner',10,9);
-            pdf.setFontSize(6.5); pdf.setFont('helvetica','normal');
-            pdf.text(`${p1} & ${p2}`,10,15);
-            pdf.text(sections[i]+' (cont.)',pageW-10,9,{align:'right'});
-          }
-          const srcH=Math.min(availH/sc,canvas.height-yOff);
-          const tmp=document.createElement('canvas');
-          tmp.width=canvas.width; tmp.height=srcH;
-          tmp.getContext('2d').drawImage(canvas,0,yOff,canvas.width,srcH,0,0,canvas.width,srcH);
-          pdf.addImage(tmp.toDataURL('image/jpeg',0.85),'JPEG',4,contentY,pageW-8,srcH*sc);
-          yOff+=srcH;
+    const priLabels={HH:'Top Priority',HL:'Important',LH:'Nice to Have',LL:'Reconsider'};
+    S.priorityItems.forEach(p=>overviewData.push([p.name,priLabels[p.key]||p.key]));
+    if(!S.priorityItems.length) overviewData.push(['(none)','']);
+    overviewData.push([],["Couple's Notes"],[v('coupleNotes')]);
+    const wsOverview=XLSX.utils.aoa_to_sheet(overviewData);
+    wsOverview['!cols']=[{wch:35},{wch:20}];
+    XLSX.utils.book_append_sheet(wb,wsOverview,'Overview');
+
+    // Checklist sheet
+    const checkData=[['Category','Task','Tip','Est. Cost','Done']];
+    TASKS.forEach(group=>{
+      group.items.forEach(item=>{
+        const cbId=`chk-${TASKS.indexOf(group)}-${group.items.indexOf(item)}`;
+        const cb=document.getElementById(cbId);
+        checkData.push([group.group,item.n,item.t||'',item.c||'',cb&&cb.checked?'Yes':'No']);
+      });
+      document.querySelectorAll(`#checklistCt .check-group[data-gi="${TASKS.indexOf(group)}"] .check-item`).forEach(el=>{
+        const cb=el.querySelector('input[type=checkbox]');
+        if(cb&&cb.id.startsWith('chk-custom-')){
+          const name=el.querySelector('.check-item-name')?.textContent||'';
+          const tip=el.querySelector('.check-item-tip')?.textContent||'';
+          checkData.push([group.group+' (Custom)',name,tip,'',cb.checked?'Yes':'No']);
         }
-      }
-      pdf.setTextColor(161,130,107); pdf.setFontSize(5.5);
-      pdf.text('懐く — fondly remembered',pageW/2,pageH-4,{align:'center'});
-    }
-    panes.forEach((p,i)=>{p.style.display=i===0?'block':'none';});
-    document.querySelectorAll('.nav-btn').forEach((b,i)=>b.classList.toggle('active',i===0));
-    document.querySelectorAll('.pane').forEach((p,i)=>p.classList.toggle('active',i===0));
-    const fn=`Natsuku-${p1.replace(/\s+/g,'')}-${p2.replace(/\s+/g,'')}-Planner.pdf`;
-    pdf.save(fn);
-  } catch(e){ console.error(e); alert('PDF generation failed. Try again.'); }
+      });
+    });
+    const wsCheck=XLSX.utils.aoa_to_sheet(checkData);
+    wsCheck['!cols']=[{wch:28},{wch:35},{wch:55},{wch:12},{wch:6}];
+    XLSX.utils.book_append_sheet(wb,wsCheck,'Checklist');
+
+    // Itinerary sheet
+    const itinData=[['Time','Duration','Event','Phase','Vendor / Notes']];
+    const phaseLabels={prep:'Prep',p1:'Part 1',p2:'Part 2',p3:'Part 3'};
+    S.itinRows.forEach(r=>itinData.push([r.time||'',r.dur||'',r.event||'',phaseLabels[r.part]||'',r.vendor||'']));
+    const wsItin=XLSX.utils.aoa_to_sheet(itinData);
+    wsItin['!cols']=[{wch:10},{wch:10},{wch:45},{wch:10},{wch:25}];
+    XLSX.utils.book_append_sheet(wb,wsItin,'Itinerary');
+
+    // Budget sheet
+    const budgetData=[['Category','Item','Allocated','Actual Spent','Variance','Status']];
+    S.budgetRows.forEach(r=>{
+      const diff=(r.actual||0)-(r.alloc||0);
+      budgetData.push([r.cat||'',r.item||'',r.alloc||0,r.actual||0,diff,r.status||'pending']);
+    });
+    const totalAlloc=S.budgetRows.reduce((s,r)=>s+(r.alloc||0),0);
+    const totalActual=S.budgetRows.reduce((s,r)=>s+(r.actual||0),0);
+    budgetData.push([]);
+    budgetData.push(['','TOTAL',totalAlloc,totalActual,totalActual-totalAlloc,'']);
+    budgetData.push([]);
+    budgetData.push(['Cash Out',v('cashOut')]);
+    budgetData.push(['Cash In',v('cashIn')]);
+    const wsBudget=XLSX.utils.aoa_to_sheet(budgetData);
+    wsBudget['!cols']=[{wch:25},{wch:35},{wch:12},{wch:12},{wch:12},{wch:12}];
+    XLSX.utils.book_append_sheet(wb,wsBudget,'Budget');
+
+    // Vendors sheet
+    const vendorData=[['Category','Company','Contact','Email / IG','Price','Status','Notes']];
+    S.vendors.forEach(vn=>vendorData.push([vn.name||'',vn.company||'',vn.contact||'',vn.email||'',vn.price||'',vn.booked||'',vn.notes||'']));
+    const wsVendor=XLSX.utils.aoa_to_sheet(vendorData);
+    wsVendor['!cols']=[{wch:18},{wch:22},{wch:15},{wch:20},{wch:12},{wch:12},{wch:40}];
+    XLSX.utils.book_append_sheet(wb,wsVendor,'Vendors');
+
+    // Outfits sheet
+    const outfitData=[['Person','Look','Source','Notes']];
+    S.outfitRows.forEach(r=>outfitData.push([r.person||'',r.look||'',r.source||'',r.notes||'']));
+    outfitData.push([],['MUA — Bride',v('muaBride'),v('muaBrideContact')],['MUA — Groom',v('muaGroom'),v('muaGroomContact')]);
+    const wsOutfit=XLSX.utils.aoa_to_sheet(outfitData);
+    wsOutfit['!cols']=[{wch:12},{wch:25},{wch:25},{wch:30}];
+    XLSX.utils.book_append_sheet(wb,wsOutfit,'Outfits & Beauty');
+
+    // Roles sheet
+    const rolesData=[
+      ['Key Coordinators'],
+      ['Maid of Honour',v('moh'),v('mohContact')],
+      ['Best Man',v('bestman'),v('bestmanContact')],
+      [],
+      ['Wedding Party'],
+      ['Name','Role','Duties'],
+    ];
+    S.partyMembers.forEach(m=>rolesData.push([m.name||'',m.role||'',m.duties||'']));
+    rolesData.push([],['Responsibility Matrix']);
+    const roleTAs=document.querySelectorAll('.role-cell textarea');
+    const roleLabels=['Transport','Procurement','People','Coordination'];
+    roleTAs.forEach((ta,i)=>rolesData.push([roleLabels[i]||'',ta.value||'']));
+    const wsRoles=XLSX.utils.aoa_to_sheet(rolesData);
+    wsRoles['!cols']=[{wch:20},{wch:25},{wch:45}];
+    XLSX.utils.book_append_sheet(wb,wsRoles,'Roles');
+
+    // Notes sheet
+    const notesData=[
+      ['General Notes'],[v('generalNotes')],
+      [],
+      ['Nikah Registration'],
+      ['Kadi Name',v('kadiName')],
+      ['Registered Date',v('kadiDate')],
+      [],
+      ['Post-Wedding'],
+      ['Honeymoon',v('honeymoon')],
+      ['Honeymoon Budget',v('honeymoonBudget')?+v('honeymoonBudget'):''],
+      ['New Address',v('newAddress')],
+    ];
+    const wsNotes=XLSX.utils.aoa_to_sheet(notesData);
+    wsNotes['!cols']=[{wch:20},{wch:45}];
+    XLSX.utils.book_append_sheet(wb,wsNotes,'Notes');
+
+    const fn=`Natsuku-${p1n.replace(/\s+/g,'')}-${p2n.replace(/\s+/g,'')}-Planner.xlsx`;
+    XLSX.writeFile(wb,fn);
+  } catch(e){ console.error(e); alert('Excel export failed. Try again.'); }
   ov.classList.remove('show');
 }
 /* ═══════════════════════ INIT ═══════════════════════ */

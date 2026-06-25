@@ -1579,10 +1579,17 @@ function downloadHTML() {
   ov.classList.add('show');
   try {
     saveAll();
-    const savedData=localStorage.getItem('natsuku_wp');
-    const src=document.documentElement.outerHTML;
-    const seedScript='<script>localStorage.setItem("natsuku_wp",'+JSON.stringify(savedData)+');<\/script>';
-    const html='<!DOCTYPE html>\n'+src.replace('<head>','<head>'+seedScript);
+    const savedData=localStorage.getItem('natsuku_wp')||'';
+    // Clone the live document so transient UI state doesn't leak into the export
+    const clone=document.documentElement.cloneNode(true);
+    clone.querySelectorAll('.overlay.show, #toast.show').forEach(el=>el.classList.remove('show'));
+    const sb=clone.querySelector('.btn-save.saved'); if(sb) sb.classList.remove('saved');
+    // Seed the recipient's localStorage once so they can keep editing across reloads
+    const safe=JSON.stringify(savedData).replace(/</g,'\\u003c');
+    const seed=document.createElement('script');
+    seed.textContent='try{if(!localStorage.getItem("natsuku_wp"))localStorage.setItem("natsuku_wp",'+safe+');}catch(e){}';
+    clone.querySelector('head').appendChild(seed);
+    const html='<!DOCTYPE html>\n'+clone.outerHTML;
     const p1n=v('p1')||'Partner 1', p2n=v('p2')||'Partner 2';
     const blob=new Blob([html],{type:'text/html'});
     const url=URL.createObjectURL(blob);
@@ -1592,7 +1599,7 @@ function downloadHTML() {
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    setTimeout(()=>URL.revokeObjectURL(url),1500);
   } catch(e){ console.error(e); alert('HTML export failed. Try again.'); }
   ov.classList.remove('show');
 }

@@ -8,7 +8,6 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <title>懐く Wedding Planner</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet"/>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 :root{
   --forest:#3F4F46; --cream:#F4EEDC; --parchment:#F1EDDD;
@@ -515,7 +514,7 @@ hr.div{border:none;border-top:1px solid var(--border);margin:.75rem 0}
     <div class="kanji">fondly remembered · natsuku</div>
   </div>
   <div style="display:flex;gap:.5rem;align-items:center;">
-    <button class="btn-save" onclick="downloadExcel()" style="background:rgba(161,130,107,.25);letter-spacing:.1em;">⬇ Excel</button>
+    <button class="btn-save" onclick="downloadHTML()" style="background:rgba(161,130,107,.25);letter-spacing:.1em;">⬇ HTML</button>
     <button class="btn-save" onclick="saveAll()">
       <span class="save-dot"></span>Save
     </button>
@@ -787,7 +786,7 @@ Timetable with MOH / Best Man</textarea></div>
     <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.2rem;color:var(--forest);margin-bottom:.3rem">to be fondly remembered</div>
     <div style="font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;color:var(--tm)">May your celebration be cherished — Natsuku</div>
     <div class="action-row" style="justify-content:center;margin-top:1rem">
-      <button class="btn" onclick="downloadExcel()">⬇ Export Excel</button>
+      <button class="btn" onclick="downloadHTML()">⬇ Export HTML</button>
     </div>
   </div>
 </div>
@@ -837,7 +836,7 @@ Timetable with MOH / Best Man</textarea></div>
   </button>
 </nav>
 <div class="toast" id="toast">Saved ✓</div>
-<div class="overlay" id="overlay"><div class="overlay-text" id="overlayText">Generating Excel…</div></div>
+<div class="overlay" id="overlay"><div class="overlay-text" id="overlayText">Generating HTML…</div></div>
 <script>
 'use strict';
 /* ═══════════════════════ STATE ═══════════════════════ */
@@ -1335,13 +1334,14 @@ function renderBudget() {
     hdr.innerHTML = `
       <span class="budget-cat-name">${catName}</span>
       <span class="budget-cat-total${catOver?' over':''}">
-        ${catActual>0?`$${catActual.toLocaleString()} / `:''}$${catAlloc.toLocaleString()}${catOver?' ⚠️':''}
+        ${catActual>0?`$${catActual.toLocaleString()} / `:''}${catAlloc?'$'+catAlloc.toLocaleString():'—'}${catOver?' ⚠️':''}
       </span>`;
     el.appendChild(hdr);
     entries.forEach(({row, i}) => {
       const diff = (row.actual||0) - (row.alloc||0);
+      const hasNums = row.alloc || row.actual;
       const varColor = diff > 0 ? 'over' : 'good';
-      const varText = diff === 0 ? 'On budget' : diff > 0 ? `+$${diff.toLocaleString()} over` : `$${Math.abs(diff).toLocaleString()} left`;
+      const varText = !hasNums ? '' : diff === 0 ? 'On budget' : diff > 0 ? `+$${diff.toLocaleString()} over` : `$${Math.abs(diff).toLocaleString()} left`;
       const sClass = row.status==='confirmed' ? 'status-confirmed' : row.status==='optional' ? 'status-optional' : 'status-pending';
       const sLabel = row.status==='confirmed' ? 'Confirmed' : row.status==='optional' ? 'Optional' : 'Pending';
       const div = document.createElement('div');
@@ -1350,13 +1350,13 @@ function renderBudget() {
         <div class="budget-item-left" onclick="this.closest('.budget-item').classList.toggle('open')">
           <div class="budget-item-name">${row.item||'Unnamed'}</div>
           <div class="budget-item-sub">
-            <span class="budget-alloc">Alloc: $${(row.alloc||0).toLocaleString()}</span>
+            <span class="budget-alloc">${row.alloc?'Alloc: $'+(row.alloc).toLocaleString():''}</span>
             ${row.actual ? `<span class="budget-actual">Actual: $${row.actual.toLocaleString()}</span>` : ''}
             <span class="budget-status-badge ${sClass}">${sLabel}</span>
           </div>
         </div>
         <div class="budget-item-right" onclick="this.closest('.budget-item').classList.toggle('open')">
-          <div class="budget-variance ${row.actual ? varColor : ''}">${row.actual ? varText : ''}</div>
+          <div class="budget-variance ${hasNums ? varColor : ''}">${varText}</div>
           <div style="font-size:.8rem;color:var(--tm);margin-top:2px">▾</div>
         </div>
         <div class="budget-edit" style="grid-column:1/-1">
@@ -1572,137 +1572,139 @@ function addPartyMember() {
   renderParty();
 }
 /* ═══════════════════════ EXCEL EXPORT ════════════════ */
-function downloadExcel() {
+function downloadHTML() {
   const ov=document.getElementById('overlay');
   const ot=document.getElementById('overlayText');
-  ot.textContent='Generating Excel…';
+  ot.textContent='Generating HTML…';
   ov.classList.add('show');
   try {
-    const wb=XLSX.utils.book_new();
     const p1n=v('p1')||'Partner 1', p2n=v('p2')||'Partner 2';
     const wDate=v('wDate'), venue=v('wVenue');
-
-    // Overview sheet
-    const overviewData=[
-      ['Natsuku Wedding Planner'],
-      [],
-      ['Partner 1',p1n],
-      ['Partner 2',p2n],
-      ['Wedding Date',wDate],
-      ['Venue',venue],
-      ['Total Budget',v('totalBudget')?+v('totalBudget'):''],
-      ['Guest Count',v('guestCount')?+v('guestCount'):''],
-      [],
-      ['Priority Matrix'],
-      ['Item','Priority Level'],
-    ];
     const priLabels={HH:'Top Priority',HL:'Important',LH:'Nice to Have',LL:'Reconsider'};
-    S.priorityItems.forEach(p=>overviewData.push([p.name,priLabels[p.key]||p.key]));
-    if(!S.priorityItems.length) overviewData.push(['(none)','']);
-    overviewData.push([],["Couple's Notes"],[v('coupleNotes')]);
-    const wsOverview=XLSX.utils.aoa_to_sheet(overviewData);
-    wsOverview['!cols']=[{wch:35},{wch:20}];
-    XLSX.utils.book_append_sheet(wb,wsOverview,'Overview');
+    const phaseLabels={prep:'Prep',p1:'Part 1',p2:'Part 2',p3:'Part 3'};
+    const esc=s=>(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 
-    // Checklist sheet
-    const checkData=[['Category','Task','Tip','Est. Cost','Done']];
-    TASKS.forEach(group=>{
-      group.items.forEach(item=>{
-        const cbId=`chk-${TASKS.indexOf(group)}-${group.items.indexOf(item)}`;
-        const cb=document.getElementById(cbId);
-        checkData.push([group.group,item.n,item.t||'',item.c||'',cb&&cb.checked?'Yes':'No']);
+    let priRows='';
+    S.priorityItems.forEach(p=>{priRows+=`<tr><td>${esc(p.name)}</td><td>${esc(priLabels[p.key]||p.key)}</td></tr>`;});
+    if(!S.priorityItems.length) priRows='<tr><td>(none)</td><td></td></tr>';
+
+    let checkRows='';
+    TASKS.forEach((group,gi)=>{
+      group.items.forEach((item,ii)=>{
+        const cb=document.getElementById(`chk-${gi}-${ii}`);
+        checkRows+=`<tr><td>${esc(group.group)}</td><td>${esc(item.n)}</td><td>${esc(item.t)}</td><td>${esc(item.c)}</td><td>${cb&&cb.checked?'✓':'—'}</td></tr>`;
       });
-      document.querySelectorAll(`#checklistCt .check-group[data-gi="${TASKS.indexOf(group)}"] .check-item`).forEach(el=>{
+      document.querySelectorAll(`#checklistCt .check-group[data-gi="${gi}"] .check-item`).forEach(el=>{
         const cb=el.querySelector('input[type=checkbox]');
         if(cb&&cb.id.startsWith('chk-custom-')){
           const name=el.querySelector('.check-item-name')?.textContent||'';
           const tip=el.querySelector('.check-item-tip')?.textContent||'';
-          checkData.push([group.group+' (Custom)',name,tip,'',cb.checked?'Yes':'No']);
+          checkRows+=`<tr><td>${esc(group.group)} (Custom)</td><td>${esc(name)}</td><td>${esc(tip)}</td><td></td><td>${cb.checked?'✓':'—'}</td></tr>`;
         }
       });
     });
-    const wsCheck=XLSX.utils.aoa_to_sheet(checkData);
-    wsCheck['!cols']=[{wch:28},{wch:35},{wch:55},{wch:12},{wch:6}];
-    XLSX.utils.book_append_sheet(wb,wsCheck,'Checklist');
 
-    // Itinerary sheet
-    const itinData=[['Time','Duration','Event','Phase','Vendor / Notes']];
-    const phaseLabels={prep:'Prep',p1:'Part 1',p2:'Part 2',p3:'Part 3'};
-    S.itinRows.forEach(r=>itinData.push([r.time||'',r.dur||'',r.event||'',phaseLabels[r.part]||'',r.vendor||'']));
-    const wsItin=XLSX.utils.aoa_to_sheet(itinData);
-    wsItin['!cols']=[{wch:10},{wch:10},{wch:45},{wch:10},{wch:25}];
-    XLSX.utils.book_append_sheet(wb,wsItin,'Itinerary');
+    let itinRows='';
+    S.itinRows.forEach(r=>{itinRows+=`<tr><td>${esc(r.time)}</td><td>${esc(r.dur)}</td><td>${esc(r.event)}</td><td>${esc(phaseLabels[r.part]||'')}</td><td>${esc(r.vendor)}</td></tr>`;});
 
-    // Budget sheet
-    const budgetData=[['Category','Item','Allocated','Actual Spent','Variance','Status']];
+    let budgetRows='';
+    let totalAlloc=0, totalActual=0;
     S.budgetRows.forEach(r=>{
-      const diff=(r.actual||0)-(r.alloc||0);
-      budgetData.push([r.cat||'',r.item||'',r.alloc||0,r.actual||0,diff,r.status||'pending']);
+      const a=r.alloc||0, ac=r.actual||0, diff=ac-a;
+      totalAlloc+=a; totalActual+=ac;
+      budgetRows+=`<tr><td>${esc(r.cat)}</td><td>${esc(r.item)}</td><td>${a?'$'+a.toLocaleString():'—'}</td><td>${ac?'$'+ac.toLocaleString():'—'}</td><td>${(a||ac)?'$'+diff.toLocaleString():'—'}</td><td>${esc(r.status||'pending')}</td></tr>`;
     });
-    const totalAlloc=S.budgetRows.reduce((s,r)=>s+(r.alloc||0),0);
-    const totalActual=S.budgetRows.reduce((s,r)=>s+(r.actual||0),0);
-    budgetData.push([]);
-    budgetData.push(['','TOTAL',totalAlloc,totalActual,totalActual-totalAlloc,'']);
-    budgetData.push([]);
-    budgetData.push(['Cash Out',v('cashOut')]);
-    budgetData.push(['Cash In',v('cashIn')]);
-    const wsBudget=XLSX.utils.aoa_to_sheet(budgetData);
-    wsBudget['!cols']=[{wch:25},{wch:35},{wch:12},{wch:12},{wch:12},{wch:12}];
-    XLSX.utils.book_append_sheet(wb,wsBudget,'Budget');
 
-    // Vendors sheet
-    const vendorData=[['Category','Company','Contact','Email / IG','Price','Status','Notes']];
-    S.vendors.forEach(vn=>vendorData.push([vn.name||'',vn.company||'',vn.contact||'',vn.email||'',vn.price||'',vn.booked||'',vn.notes||'']));
-    const wsVendor=XLSX.utils.aoa_to_sheet(vendorData);
-    wsVendor['!cols']=[{wch:18},{wch:22},{wch:15},{wch:20},{wch:12},{wch:12},{wch:40}];
-    XLSX.utils.book_append_sheet(wb,wsVendor,'Vendors');
+    let vendorRows='';
+    S.vendors.forEach(vn=>{vendorRows+=`<tr><td>${esc(vn.name)}</td><td>${esc(vn.company)}</td><td>${esc(vn.contact)}</td><td>${esc(vn.email)}</td><td>${esc(vn.price)}</td><td>${esc(vn.booked)}</td><td>${esc(vn.notes)}</td></tr>`;});
 
-    // Outfits sheet
-    const outfitData=[['Person','Look','Source','Notes']];
-    S.outfitRows.forEach(r=>outfitData.push([r.person||'',r.look||'',r.source||'',r.notes||'']));
-    outfitData.push([],['MUA — Bride',v('muaBride'),v('muaBrideContact')],['MUA — Groom',v('muaGroom'),v('muaGroomContact')]);
-    const wsOutfit=XLSX.utils.aoa_to_sheet(outfitData);
-    wsOutfit['!cols']=[{wch:12},{wch:25},{wch:25},{wch:30}];
-    XLSX.utils.book_append_sheet(wb,wsOutfit,'Outfits & Beauty');
+    let outfitRows='';
+    S.outfitRows.forEach(r=>{outfitRows+=`<tr><td>${esc(r.person)}</td><td>${esc(r.look)}</td><td>${esc(r.source)}</td><td>${esc(r.notes)}</td></tr>`;});
 
-    // Roles sheet
-    const rolesData=[
-      ['Key Coordinators'],
-      ['Maid of Honour',v('moh'),v('mohContact')],
-      ['Best Man',v('bestman'),v('bestmanContact')],
-      [],
-      ['Wedding Party'],
-      ['Name','Role','Duties'],
-    ];
-    S.partyMembers.forEach(m=>rolesData.push([m.name||'',m.role||'',m.duties||'']));
-    rolesData.push([],['Responsibility Matrix']);
+    let partyRows='';
+    S.partyMembers.forEach(m=>{partyRows+=`<tr><td>${esc(m.name)}</td><td>${esc(m.role)}</td><td>${esc(m.duties)}</td></tr>`;});
+
     const roleTAs=document.querySelectorAll('.role-cell textarea');
     const roleLabels=['Transport','Procurement','People','Coordination'];
-    roleTAs.forEach((ta,i)=>rolesData.push([roleLabels[i]||'',ta.value||'']));
-    const wsRoles=XLSX.utils.aoa_to_sheet(rolesData);
-    wsRoles['!cols']=[{wch:20},{wch:25},{wch:45}];
-    XLSX.utils.book_append_sheet(wb,wsRoles,'Roles');
+    let roleRows='';
+    roleTAs.forEach((ta,i)=>{roleRows+=`<tr><td>${esc(roleLabels[i]||'')}</td><td>${esc(ta.value)}</td></tr>`;});
 
-    // Notes sheet
-    const notesData=[
-      ['General Notes'],[v('generalNotes')],
-      [],
-      ['Nikah Registration'],
-      ['Kadi Name',v('kadiName')],
-      ['Registered Date',v('kadiDate')],
-      [],
-      ['Post-Wedding'],
-      ['Honeymoon',v('honeymoon')],
-      ['Honeymoon Budget',v('honeymoonBudget')?+v('honeymoonBudget'):''],
-      ['New Address',v('newAddress')],
-    ];
-    const wsNotes=XLSX.utils.aoa_to_sheet(notesData);
-    wsNotes['!cols']=[{wch:20},{wch:45}];
-    XLSX.utils.book_append_sheet(wb,wsNotes,'Notes');
+    const html=`<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Natsuku Wedding Planner — ${esc(p1n)} & ${esc(p2n)}</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#faf7f4;color:#3a2e28;padding:2rem;max-width:1000px;margin:auto}
+h1{text-align:center;font-size:2rem;color:#7c5e4a;margin-bottom:.3rem}
+h2{color:#7c5e4a;border-bottom:2px solid #c9a88a;padding-bottom:.3rem;margin:2rem 0 1rem}
+h3{color:#9b7e65;margin:1rem 0 .5rem}
+table{width:100%;border-collapse:collapse;margin-bottom:1.5rem;font-size:.9rem}
+th,td{border:1px solid #d4c4b0;padding:.5rem .7rem;text-align:left}
+th{background:#e8ddd2;font-weight:600}
+tr:nth-child(even){background:#f5f0eb}
+.pair{display:flex;gap:2rem;flex-wrap:wrap;margin:.5rem 0}
+.pair span{flex:1;min-width:200px}
+.label{font-weight:600;color:#7c5e4a}
+.notes-box{background:#fff;border:1px solid #d4c4b0;border-radius:8px;padding:1rem;margin:.5rem 0;white-space:pre-wrap}
+.footer{text-align:center;margin-top:3rem;font-size:.8rem;color:#9b7e65}
+@media print{body{padding:.5rem}h1{font-size:1.5rem}}
+</style></head><body>
+<h1>Natsuku Wedding Planner</h1>
+<p style="text-align:center;color:#9b7e65;margin-bottom:2rem">${esc(p1n)} & ${esc(p2n)}</p>
 
-    const fn=`Natsuku-${p1n.replace(/\s+/g,'')}-${p2n.replace(/\s+/g,'')}-Planner.xlsx`;
-    XLSX.writeFile(wb,fn);
-  } catch(e){ console.error(e); alert('Excel export failed. Try again.'); }
+<h2>Overview</h2>
+<div class="pair"><span><span class="label">Wedding Date:</span> ${esc(wDate)}</span><span><span class="label">Venue:</span> ${esc(venue)}</span></div>
+<div class="pair"><span><span class="label">Total Budget:</span> ${v('totalBudget')?'$'+(+v('totalBudget')).toLocaleString():'—'}</span><span><span class="label">Guest Count:</span> ${esc(v('guestCount'))}</span></div>
+
+<h3>Priority Matrix</h3>
+<table><tr><th>Item</th><th>Priority</th></tr>${priRows}</table>
+
+${v('coupleNotes')?`<h3>Couple's Notes</h3><div class="notes-box">${esc(v('coupleNotes'))}</div>`:''}
+
+<h2>Checklist</h2>
+<table><tr><th>Category</th><th>Task</th><th>Tip</th><th>Est. Cost</th><th>Done</th></tr>${checkRows}</table>
+
+<h2>Itinerary</h2>
+<table><tr><th>Time</th><th>Duration</th><th>Event</th><th>Phase</th><th>Vendor / Notes</th></tr>${itinRows}</table>
+
+<h2>Budget</h2>
+<table><tr><th>Category</th><th>Item</th><th>Allocated</th><th>Actual</th><th>Variance</th><th>Status</th></tr>${budgetRows}
+<tr style="font-weight:700"><td></td><td>TOTAL</td><td>${totalAlloc?'$'+totalAlloc.toLocaleString():'—'}</td><td>${totalActual?'$'+totalActual.toLocaleString():'—'}</td><td>$${(totalActual-totalAlloc).toLocaleString()}</td><td></td></tr></table>
+<div class="pair"><span><span class="label">Cash Out:</span> ${esc(v('cashOut'))}</span><span><span class="label">Cash In:</span> ${esc(v('cashIn'))}</span></div>
+
+<h2>Vendors</h2>
+<table><tr><th>Category</th><th>Company</th><th>Contact</th><th>Email / IG</th><th>Price</th><th>Status</th><th>Notes</th></tr>${vendorRows}</table>
+
+<h2>Outfits & Beauty</h2>
+<table><tr><th>Person</th><th>Look</th><th>Source</th><th>Notes</th></tr>${outfitRows}</table>
+<div class="pair"><span><span class="label">MUA — Bride:</span> ${esc(v('muaBride'))} ${esc(v('muaBrideContact'))}</span><span><span class="label">MUA — Groom:</span> ${esc(v('muaGroom'))} ${esc(v('muaGroomContact'))}</span></div>
+
+<h2>Roles & Responsibilities</h2>
+<div class="pair"><span><span class="label">Maid of Honour:</span> ${esc(v('moh'))} ${esc(v('mohContact'))}</span><span><span class="label">Best Man:</span> ${esc(v('bestman'))} ${esc(v('bestmanContact'))}</span></div>
+<h3>Wedding Party</h3>
+<table><tr><th>Name</th><th>Role</th><th>Duties</th></tr>${partyRows}</table>
+<h3>Responsibility Matrix</h3>
+<table><tr><th>Area</th><th>Details</th></tr>${roleRows}</table>
+
+<h2>Notes</h2>
+${v('generalNotes')?`<h3>General Notes</h3><div class="notes-box">${esc(v('generalNotes'))}</div>`:''}
+<div class="pair"><span><span class="label">Kadi Name:</span> ${esc(v('kadiName'))}</span><span><span class="label">Registered Date:</span> ${esc(v('kadiDate'))}</span></div>
+<div class="pair"><span><span class="label">Honeymoon:</span> ${esc(v('honeymoon'))}</span><span><span class="label">Honeymoon Budget:</span> ${v('honeymoonBudget')?'$'+(+v('honeymoonBudget')).toLocaleString():''}</span></div>
+<div class="pair"><span><span class="label">New Address:</span> ${esc(v('newAddress'))}</span></div>
+
+<div class="footer">Exported from Natsuku Wedding Planner</div>
+</body></html>`;
+
+    const blob=new Blob([html],{type:'text/html'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url;
+    a.download=`Natsuku-${p1n.replace(/\s+/g,'')}-${p2n.replace(/\s+/g,'')}-Planner.html`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  } catch(e){ console.error(e); alert('HTML export failed. Try again.'); }
   ov.classList.remove('show');
 }
 /* ═══════════════════════ INIT ═══════════════════════ */

@@ -1,0 +1,1569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<title>懐く Wedding Planner</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+:root{
+  --forest:#3F4F46; --cream:#F4EEDC; --parchment:#F1EDDD;
+  --sienna:#A1826B; --teal:#224D5B;
+  --sl:rgba(161,130,107,.15); --fl:rgba(63,79,70,.08); --tl:rgba(34,77,91,.10);
+  --td:#2a2a25; --tm:#5a5a52; --border:rgba(161,130,107,.22);
+  --nav-h:64px; --safe-b:env(safe-area-inset-bottom,0px);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{
+  background:var(--parchment);color:var(--td);
+  font-family:'Jost',sans-serif;font-weight:300;
+  min-height:100vh;overflow-x:hidden;
+  padding-bottom:calc(var(--nav-h) + var(--safe-b) + 54px);
+}
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+  opacity:.025;
+}
+
+/* ── HEADER ─────────────────────────────── */
+.top-bar{
+  background:var(--forest);color:var(--cream);
+  padding:.9rem 1.1rem .75rem;
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:100;
+  box-shadow:0 2px 12px rgba(0,0,0,.18);
+}
+.top-bar-left h1{
+  font-family:'Cormorant Garamond',serif;font-size:1.35rem;
+  font-weight:400;letter-spacing:.02em;line-height:1;
+}
+.top-bar-left h1 em{font-style:italic;opacity:.75}
+.top-bar-left .kanji{
+  font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;
+  color:rgba(241,237,221,.4);margin-top:2px;
+}
+.btn-save{
+  background:var(--sienna);color:var(--cream);border:none;
+  padding:.5rem 1rem;font-family:'Jost',sans-serif;font-size:.65rem;
+  font-weight:500;letter-spacing:.12em;text-transform:uppercase;
+  border-radius:2px;cursor:pointer;white-space:nowrap;
+  min-height:40px;display:flex;align-items:center;gap:.4rem;
+  transition:background .2s;
+}
+.btn-save:active{background:#8e6f5a}
+.btn-save .save-dot{
+  width:6px;height:6px;border-radius:50%;background:var(--cream);
+  opacity:0;transition:opacity .3s;
+}
+.btn-save.saved .save-dot{opacity:1}
+/* ── COUPLE BANNER ───────────────────────── */
+.couple-banner{
+  background:var(--teal);padding:.85rem 1.1rem;
+  display:grid;grid-template-columns:1fr auto 1fr;
+  gap:.6rem;align-items:end;
+}
+.cf{display:flex;flex-direction:column;gap:3px}
+.cf label{font-size:.55rem;letter-spacing:.16em;text-transform:uppercase;color:rgba(241,237,221,.45)}
+.cf input{
+  background:transparent;border:none;border-bottom:1px solid rgba(241,237,221,.25);
+  color:var(--cream);font-family:'Cormorant Garamond',serif;font-size:1rem;
+  padding:.15rem .3rem;outline:none;width:100%;min-height:36px;
+}
+.cf input::placeholder{color:rgba(241,237,221,.25)}
+.couple-sep{
+  font-family:'Cormorant Garamond',serif;font-style:italic;
+  color:var(--sienna);font-size:1.1rem;padding-bottom:.2rem;text-align:center;
+}
+.wedding-meta{
+  background:rgba(34,77,91,.7);padding:.6rem 1.1rem;
+  display:grid;grid-template-columns:1fr 1fr;gap:.6rem;
+}
+/* ── BOTTOM NAV ─────────────────────────── */
+.bottom-nav{
+  position:fixed;bottom:0;left:0;right:0;z-index:200;
+  background:var(--forest);
+  display:flex;align-items:stretch;
+  padding-bottom:var(--safe-b);
+  box-shadow:0 -2px 16px rgba(0,0,0,.22);
+}
+.nav-btn{
+  flex:1;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:3px;padding:.55rem .2rem;
+  background:none;border:none;cursor:pointer;
+  color:rgba(241,237,221,.38);transition:color .18s;
+  min-height:var(--nav-h);border-top:2px solid transparent;
+}
+.nav-btn.active{color:var(--cream);border-top-color:var(--sienna)}
+.nav-btn svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.nav-btn span{font-size:.5rem;letter-spacing:.1em;text-transform:uppercase;font-weight:500}
+/* ── PANES ───────────────────────────────── */
+.pane{display:none}
+.pane.active{display:block;animation:fadeUp .25s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+main{padding:.75rem .85rem 1rem;max-width:640px;margin:0 auto}
+/* ── SECTION HEADER ─────────────────────── */
+.sec-head{padding:.6rem 0 1rem}
+.sec-head h2{
+  font-family:'Cormorant Garamond',serif;font-size:1.6rem;
+  font-weight:400;color:var(--forest);line-height:1.1;
+}
+.sec-head h2 em{font-style:italic;color:var(--sienna)}
+.sec-head p{font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--teal);margin-top:3px}
+/* ── CARD ───────────────────────────────── */
+.card{
+  background:var(--cream);border:1px solid var(--border);
+  border-left:3px solid var(--sienna);
+  padding:1rem 1rem;margin-bottom:.85rem;border-radius:2px;
+}
+.card.teal{border-left-color:var(--teal)}
+.card.forest{border-left-color:var(--forest)}
+.card-title{
+  font-family:'Cormorant Garamond',serif;font-size:1rem;
+  font-weight:500;color:var(--forest);margin-bottom:.75rem;
+}
+/* ── FORM FIELDS ─────────────────────────── */
+.field{display:flex;flex-direction:column;gap:5px;margin-bottom:.8rem}
+.field:last-child{margin-bottom:0}
+.field label{
+  font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--tm);font-weight:500;
+}
+.field input,.field select,.field textarea{
+  background:var(--parchment);border:1px solid var(--border);
+  color:var(--td);font-family:'Jost',sans-serif;font-size:.88rem;
+  font-weight:300;padding:.6rem .75rem;outline:none;
+  border-radius:2px;width:100%;min-height:44px;
+  transition:border-color .18s;
+  -webkit-appearance:none;appearance:none;
+}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--sienna)}
+.field textarea{min-height:80px;resize:vertical;line-height:1.65}
+.field select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%235a5a52' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right .75rem center;padding-right:2rem}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:.6rem}
+.field.full{grid-column:1/-1}
+/* ── FIELD INLINE (no label) ─────────────── */
+.field-inline{
+  border:none;border-bottom:1px solid var(--border);background:transparent;
+  color:var(--td);font-family:'Jost',sans-serif;font-size:.85rem;
+  padding:.35rem .1rem;outline:none;width:100%;min-height:40px;
+}
+.field-inline:focus{border-color:var(--sienna)}
+/* ── PROGRESS BAR ───────────────────────── */
+.progress-wrap{margin-bottom:1rem}
+.progress-meta{display:flex;justify-content:space-between;
+  font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--tm);margin-bottom:.35rem}
+.progress-track{background:rgba(63,79,70,.12);height:4px;border-radius:10px;overflow:hidden}
+.progress-fill{height:100%;background:var(--forest);border-radius:10px;transition:width .4s ease}
+/* ── CHECKLIST ─────────────────────────── */
+.check-group{margin-bottom:1.25rem}
+.check-group-title{
+  font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--sienna);font-weight:500;
+  padding:.5rem 0;border-bottom:1px solid var(--border);margin-bottom:.5rem;
+}
+.check-item{
+  display:flex;align-items:flex-start;gap:.7rem;
+  padding:.6rem 0;border-bottom:1px solid rgba(161,130,107,.08);
+}
+.check-item:last-child{border-bottom:none}
+.check-item input[type=checkbox]{
+  appearance:none;-webkit-appearance:none;
+  width:20px;height:20px;min-width:20px;
+  border:1.5px solid var(--border);border-radius:3px;
+  cursor:pointer;margin-top:1px;position:relative;
+  transition:background .15s,border-color .15s;flex-shrink:0;
+}
+.check-item input[type=checkbox]:checked{background:var(--forest);border-color:var(--forest)}
+.check-item input[type=checkbox]:checked::after{
+  content:'✓';position:absolute;top:-1px;left:3px;
+  color:var(--cream);font-size:12px;
+}
+.check-item-body{flex:1;min-width:0}
+.check-item-name{font-size:.85rem;color:var(--td);line-height:1.4;cursor:pointer}
+.check-item input[type=checkbox]:checked~.check-item-body .check-item-name{
+  color:var(--tm);text-decoration:line-through;
+}
+.check-item-tip{font-size:.7rem;color:var(--tm);margin-top:3px;font-style:italic;line-height:1.5}
+.check-item-cost{font-size:.68rem;color:var(--teal);font-weight:500;white-space:nowrap;margin-top:2px}
+/* ── ITINERARY ─────────────────────────── */
+.itin-row{
+  background:var(--cream);border:1px solid var(--border);
+  border-radius:2px;margin-bottom:.5rem;
+  padding:.65rem .8rem;
+}
+.itin-row-top{display:flex;align-items:center;gap:.5rem;margin-bottom:.4rem}
+.itin-time{
+  background:var(--forest);color:var(--cream);
+  font-size:.68rem;letter-spacing:.06em;padding:.2rem .5rem;
+  border-radius:2px;white-space:nowrap;font-weight:500;min-width:60px;text-align:center;
+}
+.itin-part{
+  font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;
+  padding:.18rem .55rem;border-radius:20px;white-space:nowrap;font-weight:500;
+}
+.itin-part.prep{background:rgba(241,237,221,.8);color:var(--tm);border:1px solid var(--border)}
+.itin-part.p1{background:rgba(161,130,107,.15);color:var(--sienna)}
+.itin-part.p2{background:rgba(34,77,91,.12);color:var(--teal)}
+.itin-part.p3{background:rgba(63,79,70,.12);color:var(--forest)}
+.itin-event{font-size:.83rem;color:var(--td);line-height:1.35}
+.itin-vendor{font-size:.7rem;color:var(--tm);margin-top:2px;font-style:italic}
+.itin-edit-fields{margin-top:.5rem;display:none;border-top:1px solid var(--border);padding-top:.5rem;gap:.4rem;flex-direction:column}
+.itin-row.open .itin-edit-fields{display:flex}
+.itin-row-actions{display:flex;gap:.4rem;align-items:center;margin-top:.4rem}
+/* ── BUDGET ─────────────────────────────── */
+.budget-item{
+  background:var(--cream);border:1px solid var(--border);
+  border-radius:2px;margin-bottom:.5rem;padding:.65rem .85rem;
+  display:grid;grid-template-columns:1fr auto;align-items:center;gap:.5rem;
+}
+.budget-item-left{min-width:0}
+.budget-item-name{font-size:.85rem;color:var(--td);font-weight:400;truncate:ellipsis;white-space:nowrap;overflow:hidden}
+.budget-item-sub{display:flex;gap:.5rem;align-items:center;margin-top:3px;flex-wrap:wrap}
+.budget-alloc{font-size:.72rem;color:var(--tm)}
+.budget-actual{font-size:.72rem;color:var(--teal);font-weight:500}
+.budget-status-badge{
+  font-size:.56rem;letter-spacing:.08em;text-transform:uppercase;
+  padding:.15rem .5rem;border-radius:20px;font-weight:500;
+}
+.status-confirmed{background:rgba(63,79,70,.1);color:var(--forest)}
+.status-pending{background:rgba(161,130,107,.15);color:var(--sienna)}
+.status-optional{background:rgba(34,77,91,.1);color:var(--teal)}
+.budget-item-right{text-align:right}
+.budget-variance{font-size:.78rem;font-weight:500}
+.budget-variance.over{color:#c06450}
+.budget-variance.good{color:#4a8c6a}
+.budget-expand{
+  background:none;border:none;color:var(--tm);cursor:pointer;
+  font-size:1rem;padding:.2rem .4rem;line-height:1;
+}
+.budget-edit{display:none;margin-top:.6rem;border-top:1px solid var(--border);padding-top:.6rem}
+.budget-item.open .budget-edit{display:block}
+/* ── BUDGET SUMMARY STICKY ──────────────── */
+.budget-sticky{
+  position:sticky;top:56px;z-index:90;
+  background:var(--forest);color:var(--cream);
+  padding:.6rem 1rem;margin:.0 -.85rem .85rem;
+  display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;
+}
+.bs-item label{font-size:.52rem;letter-spacing:.14em;text-transform:uppercase;color:rgba(241,237,221,.45);display:block}
+.bs-item .val{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:400}
+.bs-item .val.over{color:#e8897a}
+.bs-item .val.good{color:#8ec4a0}
+/* ── VENDOR CARD ─────────────────────────── */
+.vendor-card{
+  background:var(--cream);border:1px solid var(--border);
+  border-left:3px solid var(--sienna);
+  border-radius:2px;margin-bottom:.75rem;overflow:hidden;
+}
+.vendor-card.teal{border-left-color:var(--teal)}
+.vendor-card.forest{border-left-color:var(--forest)}
+.vendor-header{
+  padding:.7rem .9rem;display:flex;align-items:center;
+  justify-content:space-between;cursor:pointer;user-select:none;
+  min-height:52px;
+}
+.vendor-name{font-family:'Cormorant Garamond',serif;font-size:1rem;font-weight:500;color:var(--forest)}
+.vendor-meta{display:flex;align-items:center;gap:.4rem;font-size:.68rem;color:var(--tm)}
+.vendor-body{padding:0 .9rem .9rem;display:none}
+.vendor-card.open .vendor-body{display:block}
+/* ── ROLE MATRIX ─────────────────────────── */
+.role-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);border:1px solid var(--border);border-radius:2px;overflow:hidden;margin-bottom:.85rem}
+.role-cell{background:var(--cream);padding:.75rem .9rem}
+.role-cell-title{font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;color:var(--sienna);font-weight:500;margin-bottom:.4rem}
+.role-cell textarea{width:100%;border:none;background:transparent;font-family:'Jost',sans-serif;font-size:.78rem;color:var(--td);resize:none;outline:none;min-height:70px;line-height:1.65}
+/* ── OUTFIT TABLE ───────────────────────── */
+.outfit-row{
+  background:var(--cream);border:1px solid var(--border);
+  border-radius:2px;margin-bottom:.5rem;padding:.65rem .85rem;
+}
+.outfit-row-top{display:flex;align-items:center;gap:.5rem;margin-bottom:0}
+.outfit-who{
+  font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;
+  padding:.18rem .55rem;border-radius:20px;font-weight:500;white-space:nowrap;
+}
+.outfit-who.bride{background:rgba(161,130,107,.15);color:var(--sienna)}
+.outfit-who.groom{background:rgba(34,77,91,.12);color:var(--teal)}
+.outfit-look{font-size:.85rem;color:var(--td);flex:1}
+.outfit-edit{display:none;margin-top:.5rem;border-top:1px solid var(--border);padding-top:.5rem}
+.outfit-row.open .outfit-edit{display:block}
+/* ── BTN ─────────────────────────────────── */
+.btn{
+  display:inline-flex;align-items:center;gap:.35rem;
+  background:var(--forest);color:var(--cream);border:none;
+  padding:.6rem 1.1rem;font-family:'Jost',sans-serif;
+  font-size:.65rem;font-weight:500;letter-spacing:.13em;
+  text-transform:uppercase;cursor:pointer;border-radius:2px;
+  min-height:42px;transition:background .18s;
+}
+.btn:active{background:#2e3a32}
+.btn.secondary{background:var(--sl);color:var(--sienna);border:1px solid rgba(161,130,107,.3)}
+.btn.secondary:active{background:var(--sienna);color:var(--cream)}
+.btn.danger{background:rgba(192,100,80,.1);color:#c06450;border:1px solid rgba(192,100,80,.2)}
+.btn.danger:active{background:#c06450;color:#fff}
+.btn.full{width:100%;justify-content:center}
+.btn-icon{background:none;border:none;color:var(--tm);cursor:pointer;font-size:1rem;padding:.3rem .5rem;line-height:1;min-height:36px;display:inline-flex;align-items:center}
+.btn-icon:active{color:#c06450}
+.action-row{display:flex;gap:.5rem;margin-top:.75rem;flex-wrap:wrap}
+/* ── CHIP SUGGESTIONS ───────────────────── */
+.chip-label{font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:var(--tm);margin:.5rem 0 .3rem}
+.chips{display:flex;flex-wrap:wrap;gap:.35rem;margin-bottom:.4rem}
+.chip{
+  background:var(--sl);border:1px solid rgba(161,130,107,.28);
+  color:var(--sienna);font-size:.65rem;letter-spacing:.05em;
+  padding:.25rem .65rem;border-radius:20px;cursor:pointer;
+  transition:background .15s,color .15s;min-height:30px;display:inline-flex;align-items:center;
+}
+.chip:active{background:var(--sienna);color:var(--cream)}
+.chip.teal-chip{background:var(--tl);border-color:rgba(34,77,91,.22);color:var(--teal)}
+.chip.teal-chip:active{background:var(--teal);color:var(--cream)}
+/* ── NOTES / INFO BLOCK ─────────────────── */
+.info-block{
+  background:var(--cream);border-left:3px solid var(--sienna);
+  padding:.75rem .9rem;margin-bottom:.75rem;border-radius:0 2px 2px 0;
+  font-size:.78rem;color:var(--tm);font-style:italic;line-height:1.7;
+}
+.info-block.teal{border-left-color:var(--teal)}
+.info-block.forest{border-left-color:var(--forest)}
+/* ── MATRIX GRID ────────────────────────── */
+.matrix-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);border:1px solid var(--border);border-radius:2px;overflow:hidden;margin-bottom:.85rem}
+.quadrant{background:var(--cream);padding:.85rem .9rem;min-height:110px}
+.quadrant.q1{border-left:3px solid var(--sienna)}
+.quadrant.q2{border-left:2px solid var(--teal)}
+.quadrant.q3{border-left:2px solid var(--forest)}
+.quadrant.q4{background:var(--parchment)}
+.q-badge{font-size:.52rem;letter-spacing:.16em;text-transform:uppercase;font-weight:500;margin-bottom:3px}
+.q1 .q-badge{color:var(--sienna)}.q2 .q-badge{color:var(--teal)}.q3 .q-badge{color:var(--forest)}.q4 .q-badge{color:var(--tm)}
+.q-name{font-family:'Cormorant Garamond',serif;font-size:.88rem;color:var(--forest);font-weight:500;margin-bottom:.4rem;line-height:1.2}
+.q-items{font-size:.72rem;color:var(--tm);line-height:1.65;white-space:pre-wrap}
+/* ── PRIORITY ITEM TAGS ─────────────────── */
+.pri-tag{
+  display:inline-flex;align-items:center;gap:.3rem;
+  background:var(--cream);border:1px solid var(--border);
+  padding:.2rem .55rem;font-size:.7rem;border-radius:2px;
+  margin:.2rem .2rem 0 0;
+}
+.pri-tag button{background:none;border:none;color:var(--tm);cursor:pointer;font-size:.75rem;padding:0 .1rem;line-height:1}
+/* ── WEDDING COUNTDOWN ──────────────────── */
+.countdown-card{
+  background:var(--forest);color:var(--cream);
+  padding:.9rem 1rem;border-radius:2px;margin-bottom:.85rem;
+  display:flex;align-items:center;justify-content:space-between;
+  position:relative;overflow:hidden;
+}
+.countdown-card::after{
+  content:'懐く';position:absolute;right:.5rem;top:50%;
+  transform:translateY(-50%);font-size:4.5rem;opacity:.05;
+  font-family:serif;pointer-events:none;color:var(--cream);
+}
+.countdown-left label{font-size:.55rem;letter-spacing:.16em;text-transform:uppercase;color:rgba(241,237,221,.45);display:block;margin-bottom:3px}
+.countdown-days{font-family:'Cormorant Garamond',serif;font-size:2.2rem;font-weight:400;line-height:1}
+.countdown-unit{font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(241,237,221,.45);margin-left:.3rem}
+/* ── SAVE TOAST ─────────────────────────── */
+.toast{
+  position:fixed;bottom:calc(var(--nav-h) + var(--safe-b) + 12px);
+  left:50%;transform:translateX(-50%) translateY(20px);
+  background:var(--forest);color:var(--cream);
+  font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;
+  padding:.55rem 1.2rem;border-radius:20px;
+  opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;z-index:500;
+  white-space:nowrap;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+/* ── LOADING OVERLAY ─────────────────────── */
+.overlay{
+  display:none;position:fixed;inset:0;
+  background:rgba(63,79,70,.85);z-index:1000;
+  align-items:center;justify-content:center;flex-direction:column;gap:.75rem;
+}
+.overlay.show{display:flex}
+.overlay-text{color:var(--cream);font-size:.7rem;letter-spacing:.18em;text-transform:uppercase}
+/* ── BUDGET OVER WARNING ─────────────────── */
+.budget-warning{
+  display:none;
+  background:rgba(192,100,80,.1);border:1.5px solid rgba(192,100,80,.35);
+  border-left:4px solid #c06450;border-radius:2px;
+  padding:.75rem .9rem;margin-bottom:.85rem;
+}
+.budget-warning.show{display:flex;align-items:flex-start;gap:.6rem}
+.budget-warning-icon{font-size:1.1rem;line-height:1.3;flex-shrink:0}
+.budget-warning-body{}
+.budget-warning-title{
+  font-size:.72rem;font-weight:500;letter-spacing:.08em;text-transform:uppercase;
+  color:#c06450;margin-bottom:3px;
+}
+.budget-warning-msg{font-size:.78rem;color:var(--td);line-height:1.55}
+.budget-warning-amt{font-family:'Cormorant Garamond',serif;font-size:1.15rem;color:#c06450;font-weight:500}
+/* ── BUDGET STICKY OVER STATE ───────────── */
+.budget-sticky.over-budget{background:#8b3a2a}
+.budget-sticky.over-budget .bs-item .val{color:#f9c5bc}
+/* ── BUDGET CATEGORY HEADER ─────────────── */
+.budget-cat-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:.45rem .1rem .3rem;margin-top:.85rem;margin-bottom:.3rem;
+  border-bottom:1.5px solid var(--border);
+}
+.budget-cat-header:first-child{margin-top:0}
+.budget-cat-name{
+  font-size:.6rem;letter-spacing:.18em;text-transform:uppercase;
+  font-weight:500;color:var(--forest);
+}
+.budget-cat-total{
+  font-size:.68rem;color:var(--tm);font-weight:400;
+}
+.budget-cat-total.over{color:#c06450;font-weight:500}
+/* ── MISC ───────────────────────────────── */
+hr.div{border:none;border-top:1px solid var(--border);margin:.75rem 0}
+.tag{display:inline-block;background:var(--tl);border:1px solid rgba(34,77,91,.2);color:var(--teal);font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;padding:.15rem .5rem;border-radius:20px;font-weight:500}
+.empty-state{text-align:center;padding:2rem 1rem;color:var(--tm);font-size:.82rem;font-style:italic}
+
+/* ── PANE NAV BAR ────────────────────────── */
+.pane-nav-bar{
+  position:fixed;
+  bottom:calc(var(--nav-h) + var(--safe-b));
+  left:0;right:0;z-index:190;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:.5rem .85rem;
+  background:var(--cream);
+  border-top:1px solid var(--border);
+  box-shadow:0 -2px 10px rgba(0,0,0,.07);
+}
+.pnb-center{
+  font-size:.52rem;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--tm);text-align:center;flex:1;line-height:1.5;
+}
+.pnb-title{
+  font-family:'Cormorant Garamond',serif;font-style:italic;
+  font-size:.95rem;color:var(--forest);
+  text-transform:none;letter-spacing:.02em;display:block;font-weight:400;
+}
+.btn-pnav{
+  background:none;border:1.5px solid var(--border);border-radius:2px;
+  color:var(--forest);font-family:'Jost',sans-serif;font-size:.58rem;
+  letter-spacing:.1em;text-transform:uppercase;font-weight:500;
+  padding:.4rem .75rem;cursor:pointer;min-height:38px;
+  display:flex;align-items:center;gap:.3rem;
+  transition:background .18s,color .18s,border-color .18s;white-space:nowrap;
+}
+.btn-pnav:hover{background:var(--forest);color:var(--cream);border-color:var(--forest)}
+.btn-pnav:active{background:#2e3a32;color:var(--cream)}
+.btn-pnav:disabled{opacity:.22;pointer-events:none}
+
+/* ── DESKTOP RESPONSIVE ──────────────────── */
+@media (min-width:820px){
+  :root{--sidebar-w:210px;--nav-h:0px}
+  body{padding-bottom:54px;padding-left:var(--sidebar-w)}
+  .bottom-nav{
+    position:fixed;left:0;top:0;right:auto;bottom:0;
+    width:var(--sidebar-w);height:100vh;
+    flex-direction:column;align-items:stretch;
+    justify-content:flex-start;
+    padding:0;overflow-y:auto;
+    box-shadow:2px 0 20px rgba(0,0,0,.22);
+  }
+  .bottom-nav::before{
+    content:'懐く';display:block;
+    font-family:serif;font-size:2.4rem;
+    color:rgba(241,237,221,.12);text-align:center;
+    padding:1.4rem 0 .8rem;
+    border-bottom:1px solid rgba(241,237,221,.08);
+    margin-bottom:.4rem;
+  }
+  .nav-btn{
+    flex:none;flex-direction:row;justify-content:flex-start;
+    gap:.8rem;padding:.8rem 1.3rem;min-height:48px;
+    border-top:none;border-left:3px solid transparent;
+    text-align:left;
+  }
+  .nav-btn.active{
+    border-top-color:transparent;border-left-color:var(--sienna);
+    background:rgba(241,237,221,.07);
+  }
+  .nav-btn span{font-size:.65rem;letter-spacing:.1em}
+  .nav-btn svg{width:18px;height:18px;flex-shrink:0}
+  main{max-width:none;padding:1.5rem 3rem 2rem;margin:0}
+  .budget-sticky{top:60px;margin:0 -3rem .85rem;padding:.6rem 3rem}
+  .pane-nav-bar{left:var(--sidebar-w);bottom:0}
+  .toast{bottom:12px;left:calc(var(--sidebar-w) + 50%);transform:translateX(-50%) translateY(20px)}
+  .toast.show{transform:translateX(-50%) translateY(0)}
+  .overlay{left:var(--sidebar-w)}
+  .sec-head h2{font-size:2rem}
+  .couple-banner{gap:1rem;padding:.85rem 3rem}
+  .wedding-meta{padding:.6rem 3rem}
+  .top-bar{padding:.9rem 3rem .75rem}
+}
+</style>
+</head>
+<body>
+<!-- HEADER -->
+<div class="top-bar">
+  <div class="top-bar-left">
+    <h1>懐く <em>Wedding</em></h1>
+    <div class="kanji">fondly remembered · natsuku</div>
+  </div>
+  <div style="display:flex;gap:.5rem;align-items:center;">
+    <button class="btn-save" onclick="downloadPDF()" style="background:rgba(161,130,107,.25);letter-spacing:.1em;">⬇ PDF</button>
+    <button class="btn-save" onclick="saveAll()">
+      <span class="save-dot"></span>Save
+    </button>
+  </div>
+</div>
+<!-- COUPLE BANNER -->
+<div class="couple-banner">
+  <div class="cf">
+    <label>Partner 1</label>
+    <input id="p1" type="text" placeholder="Name"/>
+  </div>
+  <div class="couple-sep">&amp;</div>
+  <div class="cf">
+    <label>Partner 2</label>
+    <input id="p2" type="text" placeholder="Name"/>
+  </div>
+</div>
+<div class="wedding-meta">
+  <div class="cf">
+    <label>Wedding Date</label>
+    <input id="wDate" type="date" style="color:var(--cream);background:transparent;border:none;border-bottom:1px solid rgba(241,237,221,.25);padding:.15rem .3rem;outline:none;font-family:'Jost',sans-serif;font-size:.82rem;width:100%;min-height:36px;-webkit-appearance:none;color-scheme:dark;"/>
+  </div>
+  <div class="cf">
+    <label>Venue</label>
+    <input id="wVenue" type="text" placeholder="Venue name" style="color:var(--cream);background:transparent;border:none;border-bottom:1px solid rgba(241,237,221,.25);padding:.15rem .3rem;outline:none;font-family:'Jost',sans-serif;font-size:.82rem;width:100%;min-height:36px;"/>
+  </div>
+</div>
+<!-- PANES -->
+<main id="mainContent">
+<!-- ═══ PANE 0: OVERVIEW ═══ -->
+<div class="pane active" id="pane-0">
+  <div class="sec-head"><h2><em>Overview</em></h2><p>Your wedding at a glance</p></div>
+  <div id="countdownCard" class="countdown-card">
+    <div class="countdown-left">
+      <label>Days Until Your Wedding</label>
+      <div>
+        <span class="countdown-days" id="cdDays">—</span>
+        <span class="countdown-unit">days to go</span>
+      </div>
+    </div>
+    <div style="text-align:right">
+      <div style="font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;color:rgba(241,237,221,.4);margin-bottom:3px">Progress</div>
+      <div style="font-family:'Cormorant Garamond',serif;font-size:1.3rem" id="cdProgress">0%</div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">Priority Matrix</div>
+    <div style="font-size:.75rem;color:var(--tm);margin-bottom:.75rem;line-height:1.6">Add your wedding elements and rate their importance and want.</div>
+    <div style="display:flex;gap:.5rem;margin-bottom:.5rem;flex-wrap:wrap">
+      <input type="text" id="priInput" placeholder="e.g. Photography…" class="field-inline" style="flex:1;min-width:120px;border:1px solid var(--border);border-radius:2px;padding:.5rem .65rem;background:var(--parchment);"/>
+      <select id="priImport" style="border:1px solid var(--border);background:var(--parchment);font-family:'Jost',sans-serif;font-size:.78rem;padding:.5rem .65rem;border-radius:2px;outline:none;min-height:44px;color:var(--td);-webkit-appearance:none;appearance:none;min-width:130px">
+        <option value="HH">🔴 Top Priority</option>
+        <option value="HL">🟡 Important</option>
+        <option value="LH">🟢 Nice to Have</option>
+        <option value="LL">⚪ Reconsider</option>
+      </select>
+      <button class="btn" onclick="addPriItem()" style="padding:.5rem .85rem">+</button>
+    </div>
+    <div class="chip-label">Quick add</div>
+    <div class="chips" id="priChips"></div>
+    <div id="priTags" style="margin-top:.5rem;display:flex;flex-wrap:wrap"></div>
+  </div>
+  <div class="matrix-grid">
+    <div class="quadrant q1"><div class="q-badge">Top Priority</div><div class="q-name">High + High</div><div class="q-items" id="q-HH">—</div></div>
+    <div class="quadrant q2"><div class="q-badge">Important</div><div class="q-name">High + Low</div><div class="q-items" id="q-HL">—</div></div>
+    <div class="quadrant q3"><div class="q-badge">Nice to Have</div><div class="q-name">Low + High</div><div class="q-items" id="q-LH">—</div></div>
+    <div class="quadrant q4"><div class="q-badge">Reconsider</div><div class="q-name">Low + Low</div><div class="q-items" id="q-LL">—</div></div>
+  </div>
+  <div class="card teal">
+    <div class="card-title">Budget Overview</div>
+    <div class="two-col">
+      <div class="field"><label>Total Budget (SGD)</label><input type="number" id="totalBudget" placeholder="25000" oninput="updateOverviewBudget()"/></div>
+      <div class="field"><label>Guest Count</label><input type="number" id="guestCount" placeholder="200" oninput="updateOverviewBudget()"/></div>
+    </div>
+    <div class="two-col" style="margin-top:.25rem">
+      <div style="background:var(--parchment);border:1px solid var(--border);border-radius:2px;padding:.5rem .75rem">
+        <div style="font-size:.55rem;letter-spacing:.13em;text-transform:uppercase;color:var(--tm);margin-bottom:2px">Per head</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:1.3rem;color:var(--teal)" id="perHead">—</div>
+      </div>
+      <div style="background:var(--parchment);border:1px solid var(--border);border-radius:2px;padding:.5rem .75rem">
+        <div style="font-size:.55rem;letter-spacing:.13em;text-transform:uppercase;color:var(--tm);margin-bottom:2px">Already budgeted</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:1.3rem;color:var(--forest)" id="alreadyBudgeted">—</div>
+      </div>
+    </div>
+  </div>
+  <div class="card forest">
+    <div class="card-title">Couple's Notes</div>
+    <div class="field"><textarea id="coupleNotes" placeholder="Any shared priorities, agreements, or things to remember together…"></textarea></div>
+  </div>
+</div>
+<!-- ═══ PANE 1: CHECKLIST ═══ -->
+<div class="pane" id="pane-1">
+  <div class="sec-head"><h2><em>Checklist</em></h2><p>Every task, nothing missed</p></div>
+  <div class="progress-wrap">
+    <div class="progress-meta"><span id="checkLabel">0 of 0 tasks</span><span id="checkPct">0%</span></div>
+    <div class="progress-track"><div class="progress-fill" id="checkBar" style="width:0%"></div></div>
+  </div>
+  <div id="checklistCt"></div>
+  <div class="action-row">
+    <button class="btn secondary" onclick="addCustomTask()">+ Custom Task</button>
+  </div>
+</div>
+<!-- ═══ PANE 2: ITINERARY ═══ -->
+<div class="pane" id="pane-2">
+  <div class="sec-head"><h2><em>Itinerary</em></h2><p>Day-of timeline</p></div>
+  <div id="itinList"></div>
+  <div class="action-row">
+    <button class="btn secondary full" onclick="addItinRow()">+ Add Event</button>
+  </div>
+  <div class="info-block teal" style="margin-top:.85rem">
+    <strong style="font-style:normal;color:var(--teal)">Emcee tip:</strong> Brief your emcee on every gap — outfit changes, dinner service, photo sessions. Energy never drops if they're prepared.
+  </div>
+  <div class="info-block">
+    <strong style="font-style:normal;color:var(--sienna)">Nikah tip:</strong> Ensure Saksi + Kadi are seated before the walk-in. Mas kahwin and the marriage certificate must be on the nikah table.
+  </div>
+</div>
+<!-- ═══ PANE 3: BUDGET ═══ -->
+<div class="pane" id="pane-3">
+  <div class="sec-head"><h2><em>Budget</em></h2><p>Every dollar accounted for</p></div>
+  <div class="budget-sticky" id="budgetSticky">
+    <div class="bs-item"><label>Allocated</label><div class="val" id="bsAlloc">$0</div></div>
+    <div class="bs-item"><label>Spent</label><div class="val" id="bsSpent">$0</div></div>
+    <div class="bs-item"><label>Remaining</label><div class="val good" id="bsRem">$0</div></div>
+  </div>
+  <div class="budget-warning" id="budgetWarning">
+    <div class="budget-warning-icon">⚠️</div>
+    <div class="budget-warning-body">
+      <div class="budget-warning-title">Over budget</div>
+      <div class="budget-warning-msg">Your actual spending exceeds your allocated budget by <span class="budget-warning-amt" id="budgetOverAmt">$0</span>. Review your line items or increase your budget ceiling.</div>
+    </div>
+  </div>
+  <div id="budgetList"></div>
+  <div class="action-row">
+    <button class="btn secondary full" onclick="addBudgetItem()">+ Add Line Item</button>
+  </div>
+  <div class="card teal" style="margin-top:.85rem">
+    <div class="card-title">Cash Flow</div>
+    <div class="field"><label>Cash Out (big expenses)</label><textarea id="cashOut" placeholder="Venue deposit, bridal package, photography…"></textarea></div>
+    <div class="field"><label>Cash In (offsets)</label><textarea id="cashIn" placeholder="Duit salam, hantaran ($6k–$15k market rate), angpow…"></textarea></div>
+  </div>
+</div>
+<!-- ═══ PANE 4: VENDORS ═══ -->
+<div class="pane" id="pane-4">
+  <div class="sec-head"><h2><em>Vendors</em></h2><p>All your collaborators</p></div>
+  <div id="vendorList"></div>
+  <div class="action-row">
+    <button class="btn secondary full" onclick="addVendor()">+ Add Vendor</button>
+  </div>
+</div>
+<!-- ═══ PANE 5: OUTFITS ═══ -->
+<div class="pane" id="pane-5">
+  <div class="sec-head"><h2><em>Outfits</em> &amp; Beauty</h2><p>Every look, planned</p></div>
+  <div class="card">
+    <div class="card-title">Attire Planner</div>
+    <div id="outfitList"></div>
+    <div class="action-row"><button class="btn secondary" onclick="addOutfit()">+ Add Look</button></div>
+  </div>
+  <div class="card teal">
+    <div class="card-title">Buy, Rent or Make?</div>
+    <div class="two-col">
+      <div class="field"><label>Bride — Method</label>
+        <select>
+          <option>Bridal Package (Rent)</option>
+          <option>Purchase</option>
+          <option>Custom Tailored</option>
+          <option>Mix</option>
+        </select>
+      </div>
+      <div class="field"><label>Groom — Method</label>
+        <select>
+          <option>Bridal Package</option>
+          <option>Purchase / Bespoke</option>
+          <option>Custom Tailored</option>
+          <option>Rent standalone</option>
+        </select>
+      </div>
+    </div>
+    <div class="chip-label">Explore</div>
+    <div class="chips">
+      <span class="chip">Paper to Tailor</span>
+      <span class="chip">Bridal boutique</span>
+      <span class="chip">Mum's dress rework</span>
+      <span class="chip">Off-the-rack + alter</span>
+      <span class="chip">Bespoke suit</span>
+    </div>
+  </div>
+  <div class="card forest">
+    <div class="card-title">MUA — Make-up Artist</div>
+    <div class="two-col">
+      <div class="field"><label>Bride's MUA</label><input type="text" id="muaBride" placeholder="Name / @handle"/></div>
+      <div class="field"><label>Contact</label><input type="text" id="muaBrideContact" placeholder="+65…"/></div>
+    </div>
+    <div class="two-col">
+      <div class="field"><label>Groom's MUA</label><input type="text" id="muaGroom" placeholder="Name / @handle"/></div>
+      <div class="field"><label>Contact</label><input type="text" id="muaGroomContact" placeholder="+65…"/></div>
+    </div>
+    <div class="info-block" style="margin-top:.5rem;margin-bottom:0">Look for MUAs with a portfolio that goes beyond Instagram — ask for full wedding day coverage, not just highlight shots.</div>
+  </div>
+</div>
+<!-- ═══ PANE 6: ROLES ═══ -->
+<div class="pane" id="pane-6">
+  <div class="sec-head"><h2><em>Roles</em></h2><p>Who does what on the day</p></div>
+  <div class="card">
+    <div class="card-title">Key Coordinators</div>
+    <div class="two-col">
+      <div class="field"><label>Maid of Honour</label><input type="text" id="moh" placeholder="Name"/></div>
+      <div class="field"><label>Contact</label><input type="text" id="mohContact" placeholder="+65…"/></div>
+    </div>
+    <div class="two-col">
+      <div class="field"><label>Best Man</label><input type="text" id="bestman" placeholder="Name"/></div>
+      <div class="field"><label>Contact</label><input type="text" id="bestmanContact" placeholder="+65…"/></div>
+    </div>
+    <div class="info-block teal" style="margin-top:.5rem;margin-bottom:0">MOH is your main day-of coordinator. Choose someone calm and decisive — not just your closest friend.</div>
+  </div>
+  <div class="card teal">
+    <div class="card-title">Wedding Party</div>
+    <div id="partyList"></div>
+    <div class="action-row"><button class="btn secondary" onclick="addPartyMember()">+ Add Member</button></div>
+  </div>
+  <div class="card forest">
+    <div class="card-title">Responsibility Matrix</div>
+    <div class="role-grid">
+      <div class="role-cell"><div class="role-cell-title">Transport</div><textarea placeholder="Who drives B&G, media team, MUA?">B&G from prep → venue → shoot
+Media team + MUA transport
+At least 1 dedicated driver</textarea></div>
+      <div class="role-cell"><div class="role-cell-title">Procurement</div><textarea placeholder="Who collects flowers, dulang, gifts?">Collect: flowers, dulang, cake, gifts
+Safekeep documents (IC, cert)
+Coordinate with vendors</textarea></div>
+      <div class="role-cell"><div class="role-cell-title">People</div><textarea placeholder="Who knows which guests are VIPs?">Know parents + siblings of B&G
+Identify VIPs + seat them
+Point of contact for family</textarea></div>
+      <div class="role-cell"><div class="role-cell-title">Coordination</div><textarea placeholder="Who liaises with emcee, photographer?">Coordinate with emcee
+Brief photographer on schedule
+Timetable with MOH / Best Man</textarea></div>
+    </div>
+  </div>
+</div>
+<!-- ═══ PANE 7: NOTES ═══ -->
+<div class="pane" id="pane-7">
+  <div class="sec-head"><h2><em>Notes</em></h2><p>Reminders &amp; reflections</p></div>
+  <div class="card">
+    <div class="card-title">General Notes</div>
+    <div class="field"><textarea id="generalNotes" rows="5" placeholder="Anything you want to remember…"></textarea></div>
+  </div>
+  <div class="card teal">
+    <div class="card-title">Nikah Registration</div>
+    <div style="font-size:.75rem;color:var(--tm);line-height:1.7;margin-bottom:.75rem">Earliest registration date: <strong>150 days before wedding</strong>. Duit salam for Kadi: approx. $150.</div>
+    <div class="two-col">
+      <div class="field"><label>Kadi Name</label><input type="text" id="kadiName" placeholder="Name"/></div>
+      <div class="field"><label>Registered Date</label><input type="date" id="kadiDate"/></div>
+    </div>
+    <div class="chip-label">Marriage Prep Courses</div>
+    <div class="chips">
+      <span class="chip teal-chip">Cinta Abadi – SPMC</span>
+      <span class="chip teal-chip">Marriage &amp; Family – BDMI</span>
+      <span class="chip teal-chip">Marriage Guidance – MCAS</span>
+    </div>
+  </div>
+  <div class="card forest">
+    <div class="card-title">Post-Wedding</div>
+    <div class="two-col">
+      <div class="field"><label>Honeymoon Destination</label><input type="text" id="honeymoon" placeholder="Where to?"/></div>
+      <div class="field"><label>Honeymoon Budget</label><input type="number" id="honeymoonBudget" placeholder="5000"/></div>
+    </div>
+    <div class="field"><label>New Address</label><textarea id="newAddress" rows="2" placeholder="Block, Street, Unit, Postal Code…"></textarea></div>
+  </div>
+  <div style="text-align:center;padding:1.5rem .5rem;margin-bottom:.5rem">
+    <div style="font-size:3.5rem;opacity:.1;font-family:serif;margin-bottom:.5rem">懐く</div>
+    <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.2rem;color:var(--forest);margin-bottom:.3rem">to be fondly remembered</div>
+    <div style="font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;color:var(--tm)">May your celebration be cherished — Natsuku</div>
+    <div class="action-row" style="justify-content:center;margin-top:1rem">
+      <button class="btn" onclick="downloadPDF()">⬇ Export PDF</button>
+    </div>
+  </div>
+</div>
+</main>
+<!-- PANE NAV BAR -->
+<div class="pane-nav-bar" id="paneNavBar">
+  <button class="btn-pnav" id="pnbPrev" onclick="paneNavGo(-1)" disabled>← Prev</button>
+  <div class="pnb-center">
+    <span class="pnb-title" id="pnbTitle">Overview</span>
+    <span id="pnbStep">1 of 8</span>
+  </div>
+  <button class="btn-pnav" id="pnbNext" onclick="paneNavGo(1)">Next →</button>
+</div>
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <button class="nav-btn active" onclick="switchTab(0)" id="nav-0">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M3 9l4-4 5 3 5-3 4 4v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+    <span>Overview</span>
+  </button>
+  <button class="nav-btn" onclick="switchTab(1)" id="nav-1">
+    <svg viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+    <span>Checklist</span>
+  </button>
+  <button class="nav-btn" onclick="switchTab(2)" id="nav-2">
+    <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    <span>Itinerary</span>
+  </button>
+  <button class="nav-btn" onclick="switchTab(3)" id="nav-3">
+    <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+    <span>Budget</span>
+  </button>
+  <button class="nav-btn" onclick="switchTab(4)" id="nav-4">
+    <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+    <span>Vendors</span>
+  </button>
+  <button class="nav-btn" onclick="switchTab(5)" id="nav-5">
+    <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+    <span>Outfits</span>
+  </button>
+  <button class="nav-btn" onclick="switchTab(6)" id="nav-6">
+    <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    <span>Roles</span>
+  </button>
+  <button class="nav-btn" onclick="switchTab(7)" id="nav-7">
+    <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+    <span>Notes</span>
+  </button>
+</nav>
+<div class="toast" id="toast">Saved ✓</div>
+<div class="overlay" id="overlay"><div class="overlay-text" id="overlayText">Generating PDF…</div></div>
+<script>
+'use strict';
+/* ═══════════════════════ STATE ═══════════════════════ */
+const S = {
+  priorityItems: [],
+  budgetRows: [],
+  itinRows: [],
+  vendors: [],
+  partyMembers: [],
+  outfitRows: [],
+};
+/* ═══════════════════════ TABS ═══════════════════════ */
+const TAB_NAMES=['Overview','Checklist','Itinerary','Budget','Vendors','Outfits','Roles','Notes'];
+let currentTab=0;
+function switchTab(i){
+  currentTab=i;
+  document.querySelectorAll('.pane').forEach((p,j)=>p.classList.toggle('active',j===i));
+  document.querySelectorAll('.nav-btn').forEach((b,j)=>b.classList.toggle('active',j===i));
+  window.scrollTo(0,0);
+  updatePaneNav(i);
+}
+function updatePaneNav(i){
+  document.getElementById('pnbTitle').textContent=TAB_NAMES[i];
+  document.getElementById('pnbStep').textContent=`${i+1} of ${TAB_NAMES.length}`;
+  document.getElementById('pnbPrev').disabled=(i===0);
+  document.getElementById('pnbNext').disabled=(i===TAB_NAMES.length-1);
+}
+function paneNavGo(dir){switchTab(Math.max(0,Math.min(TAB_NAMES.length-1,currentTab+dir)));}
+/* ═══════════════════════ TOAST ══════════════════════ */
+function showToast(msg='Saved ✓') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2000);
+}
+/* ═══════════════════════ SAVE / LOAD ════════════════ */
+function saveAll() {
+  const data = {
+    p1: v('p1'), p2: v('p2'), wDate: v('wDate'), wVenue: v('wVenue'),
+    coupleNotes: v('coupleNotes'), totalBudget: v('totalBudget'), guestCount: v('guestCount'),
+    cashOut: v('cashOut'), cashIn: v('cashIn'),
+    muaBride: v('muaBride'), muaBrideContact: v('muaBrideContact'),
+    muaGroom: v('muaGroom'), muaGroomContact: v('muaGroomContact'),
+    moh: v('moh'), mohContact: v('mohContact'),
+    bestman: v('bestman'), bestmanContact: v('bestmanContact'),
+    generalNotes: v('generalNotes'), kadiName: v('kadiName'), kadiDate: v('kadiDate'),
+    honeymoon: v('honeymoon'), honeymoonBudget: v('honeymoonBudget'), newAddress: v('newAddress'),
+    checkStates: getCheckStates(),
+    roleTexts: getRoleTexts(),
+    state: S,
+  };
+  localStorage.setItem('natsuku_wp', JSON.stringify(data));
+  const btn = document.querySelector('.btn-save');
+  btn.classList.add('saved');
+  setTimeout(()=>btn.classList.remove('saved'), 1500);
+  showToast('Saved ✓');
+}
+function v(id) { const el=document.getElementById(id); return el?el.value:''; }
+function sv(id, val) { const el=document.getElementById(id); if(el) el.value=val||''; }
+function loadAll() {
+  const raw = localStorage.getItem('natsuku_wp');
+  if (!raw) return;
+  try {
+    const d = JSON.parse(raw);
+    ['p1','p2','wDate','wVenue','coupleNotes','totalBudget','guestCount',
+     'cashOut','cashIn','muaBride','muaBrideContact','muaGroom','muaGroomContact',
+     'moh','mohContact','bestman','bestmanContact','generalNotes','kadiName','kadiDate',
+     'honeymoon','honeymoonBudget','newAddress'].forEach(k=>sv(k,d[k]));
+    if (d.state) {
+      Object.assign(S, d.state);
+    }
+    if (d.checkStates) restoreCheckStates(d.checkStates);
+    if (d.roleTexts) restoreRoleTexts(d.roleTexts);
+    updateCountdown();
+    updateOverviewBudget();
+    renderMatrix();
+    renderPriTags();
+    renderBudget();
+    renderItin();
+    renderVendors();
+    renderParty();
+    renderOutfits();
+  } catch(e) { console.warn('Load error', e); }
+}
+function getCheckStates() {
+  const states = {};
+  document.querySelectorAll('#checklistCt input[type=checkbox]').forEach(cb=>{
+    states[cb.id] = cb.checked;
+  });
+  return states;
+}
+function restoreCheckStates(states) {
+  Object.entries(states).forEach(([id,checked])=>{
+    const el = document.getElementById(id);
+    if (el) el.checked = checked;
+  });
+  updateCheckProgress();
+}
+function getRoleTexts() {
+  const r = {};
+  document.querySelectorAll('.role-cell textarea').forEach((ta,i)=>{ r[i]=ta.value; });
+  return r;
+}
+function restoreRoleTexts(texts) {
+  document.querySelectorAll('.role-cell textarea').forEach((ta,i)=>{ if(texts[i]!==undefined) ta.value=texts[i]; });
+}
+/* ─── auto-save on input ─── */
+let saveTimer;
+document.addEventListener('input', ()=>{ clearTimeout(saveTimer); saveTimer=setTimeout(saveAll,1500); });
+/* ═══════════════════════ COUNTDOWN ══════════════════ */
+function updateCountdown() {
+  const dateVal = v('wDate');
+  if (!dateVal) { document.getElementById('cdDays').textContent='—'; return; }
+  const diff = Math.ceil((new Date(dateVal)-new Date())/(1000*60*60*24));
+  document.getElementById('cdDays').textContent = diff > 0 ? diff : (diff===0?'Today':'—');
+  const total = document.querySelectorAll('#checklistCt input[type=checkbox]').length;
+  const done = document.querySelectorAll('#checklistCt input[type=checkbox]:checked').length;
+  const pct = total ? Math.round(done/total*100) : 0;
+  document.getElementById('cdProgress').textContent = pct + '%';
+}
+document.getElementById('wDate').addEventListener('change', updateCountdown);
+/* ═══════════════════════ PRIORITIES ════════════════ */
+const PRI_SUBS = ['Venue','Catering','Photography','Videography','Florals',
+  'Bridal Attire','Groom Attire','Door Gifts','Emcee','Kompang',
+  'Rings','Hantaran','Wedding Cake','MUA','Invitations','Honeymoon'];
+function initPriChips() {
+  const el = document.getElementById('priChips');
+  PRI_SUBS.forEach(s=>{
+    const c = document.createElement('span');
+    c.className='chip'; c.textContent=s;
+    c.onclick=()=>{ document.getElementById('priInput').value=s; addPriItem(); };
+    el.appendChild(c);
+  });
+}
+function addPriItem() {
+  const name = document.getElementById('priInput').value.trim();
+  if (!name) return;
+  const key = document.getElementById('priImport').value;
+  S.priorityItems.push({name,key});
+  document.getElementById('priInput').value='';
+  renderMatrix();
+  renderPriTags();
+}
+function removePriItem(i) {
+  S.priorityItems.splice(i,1);
+  renderMatrix();
+  renderPriTags();
+}
+function renderPriTags() {
+  const el = document.getElementById('priTags');
+  el.innerHTML='';
+  const colors = {HH:'var(--sienna)',HL:'var(--teal)',LH:'var(--forest)',LL:'var(--tm)'};
+  S.priorityItems.forEach((item,i)=>{
+    const t = document.createElement('span');
+    t.className='pri-tag';
+    t.style.borderLeft=`3px solid ${colors[item.key]||'var(--border)'}`;
+    t.innerHTML=`<span style="font-size:.72rem">${item.name}</span><button onclick="removePriItem(${i})">✕</button>`;
+    el.appendChild(t);
+  });
+}
+function renderMatrix() {
+  const groups={HH:[],HL:[],LH:[],LL:[]};
+  const def={HH:'Allocate most budget here.',HL:'Needed but can simplify.',LH:'Consider if budget allows.',LL:'Skip or keep minimal.'};
+  S.priorityItems.forEach(item=>{ if(groups[item.key]) groups[item.key].push(item.name); });
+  Object.entries(groups).forEach(([k,items])=>{
+    document.getElementById(`q-${k}`).textContent = items.length ? items.join('\n') : def[k];
+  });
+}
+/* ═══════════════════════ OVERVIEW BUDGET ══════════ */
+function updateOverviewBudget() {
+  const budget = parseFloat(v('totalBudget'))||0;
+  const guests = parseFloat(v('guestCount'))||0;
+  document.getElementById('perHead').textContent = guests ? '$'+Math.round(budget/guests).toLocaleString() : '—';
+  const totalAlloc = S.budgetRows.reduce((s,r)=>s+(r.alloc||0),0);
+  document.getElementById('alreadyBudgeted').textContent = '$'+totalAlloc.toLocaleString();
+}
+/* ═══════════════════════ CHECKLIST ══════════════════ */
+const TASKS = [
+  { group: 'Pre-Wedding (12+ months)', items: [
+    {n:'Nikah Registration',t:'Register at earliest 150 days before. Bring IC, birth cert, documents.',c:'~$50'},
+    {n:'Marriage Preparatory Course',t:'Cinta Abadi (SPMC), BDMI, or MCAS. Some Kadis require the certificate.',c:'~$80–200'},
+    {n:'Set Wedding Budget',t:'Align with partner on the total and priority breakdown.',c:''},
+    {n:'Finalise Guest List',t:'This determines venue size. Do this before booking.',c:''},
+    {n:'Book Venue',t:'Compare prices. Weekdays can be 50% cheaper. Deposit is usually non-refundable.',c:'~$5k–30k'},
+    {n:'Hantaran Discussion',t:'Coordinate with families. Market rate: SGD $6,000–$15,000.',c:''},
+  ]},
+  { group: 'Planning Phase (6–12 months)', items: [
+    {n:'Book Photographer / Videographer',t:'Request full portfolio beyond Instagram. Confirm the actual shooter.',c:'~$2k–6k'},
+    {n:'Book Bridal / Attire',t:'Check package inclusions. Opt out of services you don\'t need.',c:'~$2k–6k'},
+    {n:'Book Emcee',t:'Brief them on the full itinerary in advance — every gap and transition.',c:'~$300–800'},
+    {n:'Book Kompang (if applicable)',t:'Traditional percussion for walk-in. Book early for peak dates.',c:'~$300–600'},
+    {n:'Invitation Cards',t:'Design, print, and send 6–8 weeks before the wedding.',c:'~$150–500'},
+    {n:'Choose Maid of Honour & Bridesmaids',t:'MOH is your main day coordinator. Choose calm and organised.',c:''},
+    {n:'Choose Best Man & Groomsmen',t:'Brief them on transport, procurement, coordination duties.',c:''},
+  ]},
+  { group: 'Final Stretch (1–6 months)', items: [
+    {n:'Book MUA',t:'Trial run recommended. Match their style to your complexion and theme.',c:'~$400–1,200'},
+    {n:'Book Caterer / Confirm Venue Catering',t:'Confirm dietary needs. Final headcount 3–5 days before.',c:'Per package'},
+    {n:'Order Rings',t:'Allow 4–6 weeks for custom rings. Mas kahwin on the nikah table.',c:'~$500–5k'},
+    {n:'Prepare Hantaran / Dulang',t:'Coordinate items with bridesmaids per family agreement.',c:'Varies'},
+    {n:'Order Wedding Cake',t:'Discuss design, flavour, serving size. Confirm delivery/setup.',c:'~$200–600'},
+    {n:'Door Gifts',t:'Budget ~$1–5 per guest. Pack with bridesmaid help.',c:'Per guest'},
+    {n:'Henna Booking',t:'Book a henna artist for the berinai session if applicable.',c:'~$150–400'},
+    {n:'Plan Transportation',t:'B&G, media team, MUA, wedding party. At least 1 dedicated driver.',c:''},
+    {n:'Bridal Fitting(s)',t:'At least 1–2 fittings. Communicate clearly on alterations.',c:'In package'},
+  ]},
+  { group: 'Final Weeks', items: [
+    {n:'Confirm All Vendors',t:'Send confirmation to every vendor: time, location, special requests.',c:''},
+    {n:'Finalise & Share Itinerary',t:'Distribute to MOH, Best Man, emcee, and all vendors.',c:''},
+    {n:'Prepare Duit Salam Kadi',t:'Approx. $150 in a sealed envelope, ready on the day.',c:'~$150'},
+    {n:'Pack Emergency Kit',t:'Safety pins, double-sided tape, touch-up makeup, pain relief, charger.',c:''},
+    {n:'Confirm Guest Attendance',t:'Final headcount to caterer and venue 3–5 days before.',c:''},
+    {n:'Prepare Saksi (witnesses)',t:'Two male Muslim witnesses confirmed and briefed. Must arrive before nikah.',c:''},
+  ]},
+  { group: 'Post-Wedding', items: [
+    {n:'Honeymoon',t:'Book flights and accommodation. Check passport validity.',c:'Varies'},
+    {n:'Update Residential Address',t:'Inform relevant parties if moving.',c:''},
+    {n:'Send Thank You Notes',t:'Acknowledge key helpers and vendors.',c:''},
+    {n:'Collect Photo / Video Gallery',t:'Photographers typically deliver within 4–8 weeks.',c:''},
+  ]},
+];
+function initChecklist() {
+  const el = document.getElementById('checklistCt');
+  TASKS.forEach((group,gi)=>{
+    const g = document.createElement('div');
+    g.className='check-group';
+    g.innerHTML=`<div class="check-group-title">${group.group}</div>`;
+    group.items.forEach((item,ii)=>{
+      const row=document.createElement('div');
+      row.className='check-item';
+      const id=`chk-${gi}-${ii}`;
+      row.innerHTML=`
+        <input type="checkbox" id="${id}" onchange="updateCheckProgress();updateCountdown()"/>
+        <div class="check-item-body">
+          <label for="${id}" class="check-item-name">${item.n}</label>
+          ${item.t?`<div class="check-item-tip">${item.t}</div>`:''}
+          ${item.c?`<div class="check-item-cost">${item.c}</div>`:''}
+        </div>`;
+      g.appendChild(row);
+    });
+    el.appendChild(g);
+  });
+  updateCheckProgress();
+}
+function updateCheckProgress() {
+  const all=document.querySelectorAll('#checklistCt input[type=checkbox]');
+  const done=document.querySelectorAll('#checklistCt input[type=checkbox]:checked');
+  const pct=all.length?Math.round(done.length/all.length*100):0;
+  document.getElementById('checkBar').style.width=pct+'%';
+  document.getElementById('checkLabel').textContent=`${done.length} of ${all.length} tasks`;
+  document.getElementById('checkPct').textContent=pct+'%';
+}
+function addCustomTask() {
+  const name=prompt('Task name:'); if(!name) return;
+  const tip=prompt('Tip (optional):')||'';
+  const g=document.querySelector('#checklistCt .check-group:last-child');
+  const id='chk-custom-'+Date.now();
+  const row=document.createElement('div');
+  row.className='check-item';
+  row.innerHTML=`
+    <input type="checkbox" id="${id}" onchange="updateCheckProgress()"/>
+    <div class="check-item-body">
+      <label for="${id}" class="check-item-name">${name}</label>
+      ${tip?`<div class="check-item-tip">${tip}</div>`:''}
+    </div>`;
+  g.appendChild(row);
+  updateCheckProgress();
+}
+/* ═══════════════════════ ITINERARY ══════════════════ */
+const DEFAULT_ITIN = [
+  {time:'2:30 PM',dur:'75 min',event:'Prep shots — B&G preparation at suite',part:'prep',vendor:'Photographer + MUA'},
+  {time:'4:00 PM',dur:'25 min',event:'Arrival & final setup at venue',part:'prep',vendor:'All vendors'},
+  {time:'4:25 PM',dur:'15 min',event:'Bride walk-in (Part 1)',part:'p1',vendor:'Photographer'},
+  {time:'4:40 PM',dur:'20 min',event:'Nikah ceremony',part:'p1',vendor:'Kadi + Saksi'},
+  {time:'5:00 PM',dur:'10 min',event:'Salam, ring exchange & certificate signing',part:'p1',vendor:''},
+  {time:'5:10 PM',dur:'10 min',event:'Salam restu — parents & elders',part:'p1',vendor:''},
+  {time:'5:20 PM',dur:'55 min',event:'Outfit change — Songket (Part 2)',part:'p2',vendor:'MUA'},
+  {time:'6:15 PM',dur:'35 min',event:'B&G walk-in with Kompang',part:'p2',vendor:'Kompang'},
+  {time:'6:50 PM',dur:'10 min',event:'Immediate family photo-taking',part:'p2',vendor:'Photographer'},
+  {time:'7:00 PM',dur:'55 min',event:'Guest photo-taking session',part:'p2',vendor:'Photographer'},
+  {time:'7:55 PM',dur:'15 min',event:'B&G dinner & speech',part:'p2',vendor:'Emcee'},
+  {time:'8:10 PM',dur:'50 min',event:'Outfit change — Final look (Part 3)',part:'p3',vendor:'MUA'},
+  {time:'9:00 PM',dur:'10 min',event:'B&G walk-in',part:'p3',vendor:''},
+  {time:'9:10 PM',dur:'5 min', event:'Cake cutting',part:'p3',vendor:'Emcee'},
+  {time:'9:15 PM',dur:'10 min',event:'Immediate family photo-taking',part:'p3',vendor:'Photographer'},
+  {time:'9:25 PM',dur:'35 min',event:'Guest photo-taking',part:'p3',vendor:'Photographer'},
+  {time:'10:00 PM',dur:'25 min',event:'Mingle + final couple shots on dais',part:'p3',vendor:''},
+  {time:'10:25 PM',dur:'5 min', event:'Doa penutup + march out',part:'p3',vendor:''},
+  {time:'10:30 PM',dur:'120 min',event:'Outdoor couple shoot',part:'p3',vendor:'Photographer'},
+];
+const PART_MAP={prep:{l:'Prep',c:'prep'},p1:{l:'Part 1',c:'p1'},p2:{l:'Part 2',c:'p2'},p3:{l:'Part 3',c:'p3'}};
+function initItin() { if(!S.itinRows.length) S.itinRows=DEFAULT_ITIN.map(r=>({...r})); renderItin(); }
+function renderItin() {
+  const el=document.getElementById('itinList');
+  el.innerHTML='';
+  S.itinRows.forEach((row,i)=>{
+    const pm=PART_MAP[row.part]||PART_MAP.prep;
+    const div=document.createElement('div');
+    div.className='itin-row';
+    div.innerHTML=`
+      <div class="itin-row-top" onclick="toggleItin(this.closest('.itin-row'))">
+        <span class="itin-time">${row.time||'—'}</span>
+        <span class="itin-part ${pm.c}">${pm.l}</span>
+        <span style="font-size:.68rem;color:var(--tm);margin-left:auto">${row.dur||''}</span>
+      </div>
+      <div class="itin-event" onclick="toggleItin(this.closest('.itin-row'))">${row.event||'Untitled event'}</div>
+      ${row.vendor?`<div class="itin-vendor">${row.vendor}</div>`:''}
+      <div class="itin-edit-fields">
+        <div class="two-col">
+          <div class="field"><label>Time</label><input type="text" value="${row.time||''}" placeholder="e.g. 4:30 PM" onchange="S.itinRows[${i}].time=this.value;renderItin()"/></div>
+          <div class="field"><label>Duration</label><input type="text" value="${row.dur||''}" placeholder="e.g. 30 min" onchange="S.itinRows[${i}].dur=this.value"/></div>
+        </div>
+        <div class="field"><label>Event</label><input type="text" value="${row.event||''}" placeholder="Event description" onchange="S.itinRows[${i}].event=this.value;renderItin()"/></div>
+        <div class="field"><label>Vendor / Notes</label><input type="text" value="${row.vendor||''}" placeholder="Who's involved" onchange="S.itinRows[${i}].vendor=this.value;renderItin()"/></div>
+        <div class="field"><label>Part / Phase</label>
+          <select onchange="S.itinRows[${i}].part=this.value;renderItin()">
+            <option value="prep" ${row.part==='prep'?'selected':''}>Prep</option>
+            <option value="p1" ${row.part==='p1'?'selected':''}>Part 1 — Nikah</option>
+            <option value="p2" ${row.part==='p2'?'selected':''}>Part 2</option>
+            <option value="p3" ${row.part==='p3'?'selected':''}>Part 3</option>
+          </select>
+        </div>
+        <div class="action-row">
+          <button class="btn danger btn-sm" onclick="S.itinRows.splice(${i},1);renderItin()">Remove</button>
+        </div>
+      </div>`;
+    el.appendChild(div);
+  });
+}
+function toggleItin(row) { row.classList.toggle('open'); }
+function addItinRow() { S.itinRows.push({time:'',dur:'',event:'',part:'p1',vendor:''}); renderItin(); const rows=document.querySelectorAll('.itin-row'); rows[rows.length-1].classList.add('open'); }
+/* ═══════════════════════ BUDGET ════════════════════ */
+const BUDGET_CATEGORIES = [
+  {
+    cat: '🏛 Venue & Catering',
+    items: [
+      {item:'Venue Rental',alloc:8000,actual:0,status:'pending'},
+      {item:'Catering & Food',alloc:4000,actual:0,status:'pending'},
+    ]
+  },
+  {
+    cat: '📸 Media & Entertainment',
+    items: [
+      {item:'Photography',alloc:2500,actual:0,status:'pending'},
+      {item:'Videography',alloc:1500,actual:0,status:'pending'},
+      {item:'Emcee',alloc:500,actual:0,status:'pending'},
+      {item:'Kompang',alloc:400,actual:0,status:'optional'},
+    ]
+  },
+  {
+    cat: '👗 Attire & Beauty',
+    items: [
+      {item:'Bridal Attire (Bride)',alloc:3000,actual:0,status:'pending'},
+      {item:'Groom Attire',alloc:800,actual:0,status:'pending'},
+      {item:'MUA — Bride',alloc:800,actual:0,status:'pending'},
+      {item:'MUA — Groom',alloc:300,actual:0,status:'pending'},
+      {item:'Henna Artist',alloc:250,actual:0,status:'optional'},
+    ]
+  },
+  {
+    cat: '💍 Ceremony & Traditions',
+    items: [
+      {item:'Nikah Registration & Duit Salam Kadi',alloc:250,actual:0,status:'pending'},
+      {item:'Wedding Rings',alloc:2000,actual:0,status:'pending'},
+      {item:'Hantaran / Dulang',alloc:500,actual:0,status:'pending'},
+    ]
+  },
+  {
+    cat: '🎁 Guests & Decor',
+    items: [
+      {item:'Florals & Decor',alloc:800,actual:0,status:'pending'},
+      {item:'Invitation Cards',alloc:300,actual:0,status:'pending'},
+      {item:'Door Gifts',alloc:600,actual:0,status:'pending'},
+      {item:'Wedding Cake',alloc:400,actual:0,status:'pending'},
+    ]
+  },
+  {
+    cat: '🚗 Logistics',
+    items: [
+      {item:'Transportation',alloc:300,actual:0,status:'pending'},
+    ]
+  },
+  {
+    cat: '✈️ Post-Wedding',
+    items: [
+      {item:'Honeymoon',alloc:2000,actual:0,status:'pending'},
+      {item:'Miscellaneous Buffer',alloc:500,actual:0,status:'pending'},
+    ]
+  },
+];
+function initBudget() {
+  if (!S.budgetRows.length) {
+    BUDGET_CATEGORIES.forEach(cat => {
+      cat.items.forEach(item => {
+        S.budgetRows.push({...item, cat: cat.cat});
+      });
+    });
+  }
+  renderBudget();
+}
+function renderBudget() {
+  const el = document.getElementById('budgetList');
+  el.innerHTML = '';
+  const catMap = new Map();
+  S.budgetRows.forEach((row, i) => {
+    const key = row.cat || 'Other';
+    if (!catMap.has(key)) catMap.set(key, []);
+    catMap.get(key).push({row, i});
+  });
+  catMap.forEach((entries, catName) => {
+    const catAlloc = entries.reduce((s,{row}) => s+(row.alloc||0), 0);
+    const catActual = entries.reduce((s,{row}) => s+(row.actual||0), 0);
+    const catOver = catActual > catAlloc;
+    const hdr = document.createElement('div');
+    hdr.className = 'budget-cat-header';
+    hdr.innerHTML = `
+      <span class="budget-cat-name">${catName}</span>
+      <span class="budget-cat-total${catOver?' over':''}">
+        ${catActual>0?`$${catActual.toLocaleString()} / `:''}$${catAlloc.toLocaleString()}${catOver?' ⚠️':''}
+      </span>`;
+    el.appendChild(hdr);
+    entries.forEach(({row, i}) => {
+      const diff = (row.actual||0) - (row.alloc||0);
+      const varColor = diff > 0 ? 'over' : 'good';
+      const varText = diff === 0 ? 'On budget' : diff > 0 ? `+$${diff.toLocaleString()} over` : `$${Math.abs(diff).toLocaleString()} left`;
+      const sClass = row.status==='confirmed' ? 'status-confirmed' : row.status==='optional' ? 'status-optional' : 'status-pending';
+      const sLabel = row.status==='confirmed' ? 'Confirmed' : row.status==='optional' ? 'Optional' : 'Pending';
+      const div = document.createElement('div');
+      div.className = 'budget-item';
+      div.innerHTML = `
+        <div class="budget-item-left" onclick="this.closest('.budget-item').classList.toggle('open')">
+          <div class="budget-item-name">${row.item||'Unnamed'}</div>
+          <div class="budget-item-sub">
+            <span class="budget-alloc">Alloc: $${(row.alloc||0).toLocaleString()}</span>
+            ${row.actual ? `<span class="budget-actual">Actual: $${row.actual.toLocaleString()}</span>` : ''}
+            <span class="budget-status-badge ${sClass}">${sLabel}</span>
+          </div>
+        </div>
+        <div class="budget-item-right" onclick="this.closest('.budget-item').classList.toggle('open')">
+          <div class="budget-variance ${row.actual ? varColor : ''}">${row.actual ? varText : ''}</div>
+          <div style="font-size:.8rem;color:var(--tm);margin-top:2px">▾</div>
+        </div>
+        <div class="budget-edit" style="grid-column:1/-1">
+          <div class="two-col">
+            <div class="field"><label>Item Name</label><input type="text" value="${row.item||''}" onchange="S.budgetRows[${i}].item=this.value;renderBudget()"/></div>
+            <div class="field"><label>Status</label>
+              <select onchange="S.budgetRows[${i}].status=this.value;renderBudget()">
+                <option value="pending" ${row.status==='pending'?'selected':''}>Pending</option>
+                <option value="confirmed" ${row.status==='confirmed'?'selected':''}>Confirmed</option>
+                <option value="optional" ${row.status==='optional'?'selected':''}>Optional</option>
+              </select>
+            </div>
+          </div>
+          <div class="two-col">
+            <div class="field"><label>Allocated ($)</label><input type="number" value="${row.alloc||''}" placeholder="0" onchange="S.budgetRows[${i}].alloc=parseFloat(this.value)||0;renderBudget();updateBudgetSummary();updateOverviewBudget()"/></div>
+            <div class="field"><label>Actual Spent ($)</label><input type="number" value="${row.actual||''}" placeholder="0" onchange="S.budgetRows[${i}].actual=parseFloat(this.value)||0;renderBudget();updateBudgetSummary()"/></div>
+          </div>
+          <div class="action-row">
+            <button class="btn danger" onclick="if(confirm('Remove?')){S.budgetRows.splice(${i},1);renderBudget();updateBudgetSummary()}">Remove</button>
+          </div>
+        </div>`;
+      el.appendChild(div);
+    });
+  });
+  updateBudgetSummary();
+}
+function addBudgetItem() {
+  const catNames = [...new Set(S.budgetRows.map(r=>r.cat||'Other')), 'Other'];
+  const catList = catNames.join('\n');
+  const chosen = prompt(`Category (or leave blank for Other):\n\n${catList}`) || 'Other';
+  S.budgetRows.push({item:'', alloc:0, actual:0, status:'pending', cat: chosen});
+  renderBudget();
+  const items = document.querySelectorAll('.budget-item');
+  items[items.length-1].classList.add('open');
+}
+function updateBudgetSummary() {
+  const alloc = S.budgetRows.reduce((s,r) => s+(r.alloc||0), 0);
+  const spent = S.budgetRows.reduce((s,r) => s+(r.actual||0), 0);
+  const rem = alloc - spent;
+  const isOver = rem < 0;
+  document.getElementById('bsAlloc').textContent = '$'+alloc.toLocaleString();
+  document.getElementById('bsSpent').textContent = '$'+spent.toLocaleString();
+  const remEl = document.getElementById('bsRem');
+  remEl.textContent = (isOver ? '-$' : '$') + Math.abs(rem).toLocaleString();
+  remEl.className = 'val ' + (isOver ? 'over' : 'good');
+  const sticky = document.getElementById('budgetSticky');
+  sticky.classList.toggle('over-budget', isOver);
+  const warning = document.getElementById('budgetWarning');
+  warning.classList.toggle('show', isOver);
+  if (isOver) {
+    document.getElementById('budgetOverAmt').textContent = '$' + Math.abs(rem).toLocaleString();
+  }
+  const navBudget = document.getElementById('nav-3');
+  navBudget.style.position = 'relative';
+  let badge = navBudget.querySelector('.nav-over-dot');
+  if (isOver) {
+    if (!badge) {
+      badge = document.createElement('span');
+      badge.className = 'nav-over-dot';
+      badge.style.cssText = 'position:absolute;top:8px;right:calc(50% - 14px);width:8px;height:8px;border-radius:50%;background:#e8897a;border:1.5px solid var(--forest);';
+      navBudget.appendChild(badge);
+    }
+  } else {
+    if (badge) badge.remove();
+  }
+}
+/* ═══════════════════════ VENDORS ════════════════════ */
+const DEFAULT_VENDORS = [
+  {name:'Venue',company:'',contact:'',email:'',price:'',booked:'pending',notes:'',color:''},
+  {name:'Photographer',company:'',contact:'',email:'',price:'',booked:'pending',notes:'Request full portfolio, not just Instagram highlights.',color:'teal'},
+  {name:'Videographer',company:'',contact:'',email:'',price:'',booked:'pending',notes:'',color:''},
+  {name:'Bridal / Attire',company:'',contact:'',email:'',price:'',booked:'pending',notes:'Confirm fittings dates and exact package inclusions.',color:'teal'},
+  {name:'MUA — Bride',company:'',contact:'',email:'',price:'',booked:'pending',notes:'',color:'forest'},
+  {name:'MUA — Groom',company:'',contact:'',email:'',price:'',booked:'pending',notes:'',color:''},
+  {name:'Emcee',company:'',contact:'',email:'',price:'',booked:'pending',notes:'Brief on full itinerary before the day.',color:'teal'},
+  {name:'Caterer',company:'',contact:'',email:'',price:'',booked:'pending',notes:'',color:''},
+  {name:'Kompang',company:'',contact:'',email:'',price:'',booked:'pending',notes:'',color:'forest'},
+  {name:'Florals / Decor',company:'',contact:'',email:'',price:'',booked:'pending',notes:'',color:''},
+];
+function initVendors() { if(!S.vendors.length) S.vendors=DEFAULT_VENDORS.map(v=>({...v})); renderVendors(); }
+function renderVendors() {
+  const el=document.getElementById('vendorList');
+  el.innerHTML='';
+  S.vendors.forEach((v,i)=>{
+    const statusColors={confirmed:'var(--forest)',optional:'var(--teal)',pending:'var(--sienna)'};
+    const statusLabels={confirmed:'Confirmed',optional:'Optional',pending:'Pending'};
+    const div=document.createElement('div');
+    div.className=`vendor-card ${v.color||''}`;
+    div.innerHTML=`
+      <div class="vendor-header" onclick="this.closest('.vendor-card').classList.toggle('open')">
+        <div>
+          <div class="vendor-name">${v.name||'New Vendor'}</div>
+          ${v.company?`<div style="font-size:.72rem;color:var(--tm);margin-top:2px">${v.company}</div>`:''}
+        </div>
+        <div class="vendor-meta">
+          <span style="color:${statusColors[v.booked]||statusColors.pending}">●</span>
+          ${statusLabels[v.booked]||'Pending'}
+        </div>
+      </div>
+      <div class="vendor-body">
+        <div class="two-col">
+          <div class="field"><label>Category</label><input type="text" value="${v.name||''}" placeholder="e.g. Photographer" onchange="S.vendors[${i}].name=this.value;renderVendors()"/></div>
+          <div class="field"><label>Company / Artist</label><input type="text" value="${v.company||''}" placeholder="Studio name" onchange="S.vendors[${i}].company=this.value"/></div>
+        </div>
+        <div class="two-col">
+          <div class="field"><label>Contact</label><input type="tel" value="${v.contact||''}" placeholder="+65…" onchange="S.vendors[${i}].contact=this.value"/></div>
+          <div class="field"><label>Email / Instagram</label><input type="text" value="${v.email||''}" placeholder="@handle" onchange="S.vendors[${i}].email=this.value"/></div>
+        </div>
+        <div class="two-col">
+          <div class="field"><label>Agreed Price ($)</label><input type="text" value="${v.price||''}" placeholder="$0" onchange="S.vendors[${i}].price=this.value"/></div>
+          <div class="field"><label>Status</label>
+            <select onchange="S.vendors[${i}].booked=this.value;renderVendors()">
+              <option value="pending" ${v.booked==='pending'?'selected':''}>Pending</option>
+              <option value="confirmed" ${v.booked==='confirmed'?'selected':''}>Confirmed</option>
+              <option value="optional" ${v.booked==='optional'?'selected':''}>Optional</option>
+            </select>
+          </div>
+        </div>
+        <div class="field"><label>Notes</label><textarea onchange="S.vendors[${i}].notes=this.value" placeholder="Package details, payment terms…">${v.notes||''}</textarea></div>
+        <div class="action-row">
+          <button class="btn danger" onclick="if(confirm('Remove vendor?')){S.vendors.splice(${i},1);renderVendors()}">Remove</button>
+        </div>
+      </div>`;
+    el.appendChild(div);
+  });
+}
+function addVendor() {
+  S.vendors.push({name:'New Vendor',company:'',contact:'',email:'',price:'',booked:'pending',notes:'',color:''});
+  renderVendors();
+  document.querySelectorAll('.vendor-card').forEach((c,i,a)=>{ if(i===a.length-1) c.classList.add('open'); });
+}
+/* ═══════════════════════ OUTFITS ════════════════════ */
+function initOutfits() {
+  if(!S.outfitRows.length) S.outfitRows=[
+    {person:'Bride',look:'Nikah Attire',source:'',notes:'Part 1 — nikah ceremony'},
+    {person:'Bride',look:'Songket',source:'',notes:'Part 2 — walk-in'},
+    {person:'Bride',look:'Western / Modern',source:'',notes:'Part 3 — final look'},
+    {person:'Groom',look:'Outfit 1 — Nikah',source:'',notes:''},
+    {person:'Groom',look:'Outfit 2 — Reception',source:'',notes:''},
+  ];
+  renderOutfits();
+}
+function renderOutfits() {
+  const el=document.getElementById('outfitList');
+  el.innerHTML='';
+  S.outfitRows.forEach((r,i)=>{
+    const div=document.createElement('div');
+    div.className='outfit-row';
+    div.innerHTML=`
+      <div class="outfit-row-top" onclick="this.closest('.outfit-row').classList.toggle('open')">
+        <span class="outfit-who ${r.person==='Bride'?'bride':'groom'}">${r.person}</span>
+        <span class="outfit-look">${r.look||'Untitled look'}</span>
+      </div>
+      ${r.notes?`<div style="font-size:.7rem;color:var(--tm);font-style:italic;margin-top:3px">${r.notes}</div>`:''}
+      <div class="outfit-edit">
+        <div class="two-col">
+          <div class="field"><label>For</label>
+            <select onchange="S.outfitRows[${i}].person=this.value;renderOutfits()">
+              <option ${r.person==='Bride'?'selected':''}>Bride</option>
+              <option ${r.person==='Groom'?'selected':''}>Groom</option>
+            </select>
+          </div>
+          <div class="field"><label>Look Name</label><input type="text" value="${r.look||''}" placeholder="e.g. Nikah Attire" onchange="S.outfitRows[${i}].look=this.value;renderOutfits()"/></div>
+        </div>
+        <div class="field"><label>Bridal / Source</label><input type="text" value="${r.source||''}" placeholder="Where it's from" onchange="S.outfitRows[${i}].source=this.value"/></div>
+        <div class="field"><label>Notes / Timing</label><input type="text" value="${r.notes||''}" placeholder="e.g. Worn during Part 2" onchange="S.outfitRows[${i}].notes=this.value;renderOutfits()"/></div>
+        <div class="action-row">
+          <button class="btn danger" onclick="S.outfitRows.splice(${i},1);renderOutfits()">Remove</button>
+        </div>
+      </div>`;
+    el.appendChild(div);
+  });
+}
+function addOutfit() {
+  S.outfitRows.push({person:'Bride',look:'',source:'',notes:''});
+  renderOutfits();
+  document.querySelectorAll('.outfit-row').forEach((r,i,a)=>{ if(i===a.length-1) r.classList.add('open'); });
+}
+/* ═══════════════════════ PARTY ══════════════════════ */
+function initParty() {
+  if(!S.partyMembers.length) S.partyMembers=[
+    {name:'',role:'Bridesmaid',duties:'Transport, procurement, guest coordination'},
+    {name:'',role:'Bridesmaid',duties:''},
+    {name:'',role:'Groomsman',duties:'Transport, knowing key guests, coordination'},
+    {name:'',role:'Groomsman',duties:''},
+  ];
+  renderParty();
+}
+function renderParty() {
+  const el=document.getElementById('partyList');
+  el.innerHTML='';
+  S.partyMembers.forEach((m,i)=>{
+    const div=document.createElement('div');
+    div.style.cssText='padding:.5rem 0;border-bottom:1px solid rgba(161,130,107,.1)';
+    div.innerHTML=`
+      <div style="display:flex;gap:.5rem;align-items:center;margin-bottom:.4rem">
+        <input class="field-inline" type="text" value="${m.name||''}" placeholder="Name" style="flex:1;border:1px solid var(--border);border-radius:2px;padding:.4rem .6rem;background:var(--cream);" onchange="S.partyMembers[${i}].name=this.value"/>
+        <select style="border:1px solid var(--border);background:var(--cream);font-family:'Jost',sans-serif;font-size:.78rem;padding:.4rem .5rem;border-radius:2px;outline:none;min-height:40px;color:var(--td)" onchange="S.partyMembers[${i}].role=this.value">
+          <option ${m.role==='Bridesmaid'?'selected':''}>Bridesmaid</option>
+          <option ${m.role==='Groomsman'?'selected':''}>Groomsman</option>
+          <option ${m.role==='Flower Girl'?'selected':''}>Flower Girl</option>
+          <option ${m.role==='Ring Bearer'?'selected':''}>Ring Bearer</option>
+          <option ${m.role==='MC Helper'?'selected':''}>MC Helper</option>
+        </select>
+        <button class="btn-icon" onclick="S.partyMembers.splice(${i},1);renderParty()">✕</button>
+      </div>
+      <input class="field-inline" type="text" value="${m.duties||''}" placeholder="Assigned duties…" style="border:1px solid var(--border);border-radius:2px;padding:.35rem .6rem;background:var(--cream);width:100%;" onchange="S.partyMembers[${i}].duties=this.value"/>`;
+    el.appendChild(div);
+  });
+}
+function addPartyMember() {
+  S.partyMembers.push({name:'',role:'Bridesmaid',duties:''});
+  renderParty();
+}
+/* ═══════════════════════ PDF ════════════════════════ */
+async function downloadPDF() {
+  const ov=document.getElementById('overlay');
+  const ot=document.getElementById('overlayText');
+  ov.classList.add('show');
+  try {
+    const {jsPDF}=window.jspdf;
+    const pdf=new jsPDF({unit:'mm',format:'a4',orientation:'portrait'});
+    const p1=v('p1')||'Partner 1', p2=v('p2')||'Partner 2';
+    const wDate=v('wDate'), venue=v('wVenue');
+    const panes=document.querySelectorAll('.pane');
+    const sections=[
+      'Overview','Checklist','Itinerary','Budget','Vendors','Outfits & Beauty','Roles','Notes'
+    ];
+    panes.forEach(p=>{p.style.display='block';p.style.opacity='1';});
+    let first=true;
+    for(let i=0;i<panes.length;i++){
+      ot.textContent=`Exporting ${sections[i]}…`;
+      const canvas=await html2canvas(panes[i],{scale:1.4,useCORS:true,backgroundColor:'#F4EEDC',scrollX:0,scrollY:0,windowWidth:640});
+      const imgData=canvas.toDataURL('image/jpeg',0.85);
+      const pageW=210,pageH=297;
+      const imgH=(canvas.height*pageW)/canvas.width;
+      if(!first) pdf.addPage(); first=false;
+      pdf.setFillColor(63,79,70); pdf.rect(0,0,pageW,20,'F');
+      pdf.setTextColor(244,238,220); pdf.setFontSize(12); pdf.setFont('helvetica','italic');
+      pdf.text('Natsuku Wedding Planner',10,9);
+      pdf.setFontSize(6.5); pdf.setFont('helvetica','normal');
+      pdf.text(`${p1} & ${p2}`,10,15);
+      if(wDate) pdf.text(wDate,95,15);
+      if(venue) pdf.text(venue,145,15);
+      pdf.text(sections[i],pageW-10,9,{align:'right'});
+      const contentY=23, availH=pageH-contentY-8;
+      if(imgH<=availH){ pdf.addImage(imgData,'JPEG',4,contentY,pageW-8,imgH); }
+      else {
+        let yOff=0; const sc=(pageW-8)/canvas.width;
+        while(yOff<canvas.height){
+          if(yOff>0){
+            pdf.addPage();
+            pdf.setFillColor(63,79,70); pdf.rect(0,0,pageW,20,'F');
+            pdf.setTextColor(244,238,220); pdf.setFontSize(12); pdf.setFont('helvetica','italic');
+            pdf.text('Natsuku Wedding Planner',10,9);
+            pdf.setFontSize(6.5); pdf.setFont('helvetica','normal');
+            pdf.text(`${p1} & ${p2}`,10,15);
+            pdf.text(sections[i]+' (cont.)',pageW-10,9,{align:'right'});
+          }
+          const srcH=Math.min(availH/sc,canvas.height-yOff);
+          const tmp=document.createElement('canvas');
+          tmp.width=canvas.width; tmp.height=srcH;
+          tmp.getContext('2d').drawImage(canvas,0,yOff,canvas.width,srcH,0,0,canvas.width,srcH);
+          pdf.addImage(tmp.toDataURL('image/jpeg',0.85),'JPEG',4,contentY,pageW-8,srcH*sc);
+          yOff+=srcH;
+        }
+      }
+      pdf.setTextColor(161,130,107); pdf.setFontSize(5.5);
+      pdf.text('懐く — fondly remembered',pageW/2,pageH-4,{align:'center'});
+    }
+    panes.forEach((p,i)=>{p.style.display=i===0?'block':'none';});
+    document.querySelectorAll('.nav-btn').forEach((b,i)=>b.classList.toggle('active',i===0));
+    document.querySelectorAll('.pane').forEach((p,i)=>p.classList.toggle('active',i===0));
+    const fn=`Natsuku-${p1.replace(/\s+/g,'')}-${p2.replace(/\s+/g,'')}-Planner.pdf`;
+    pdf.save(fn);
+  } catch(e){ console.error(e); alert('PDF generation failed. Try again.'); }
+  ov.classList.remove('show');
+}
+/* ═══════════════════════ INIT ═══════════════════════ */
+document.addEventListener('DOMContentLoaded',()=>{
+  initPriChips();
+  initChecklist();
+  initBudget();
+  initItin();
+  initVendors();
+  initOutfits();
+  initParty();
+  loadAll();
+  updateCountdown();
+  updateOverviewBudget();
+  updatePaneNav(0);
+});
+</script>
+
+</body>
+</html>

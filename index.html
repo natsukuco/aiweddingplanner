@@ -888,7 +888,7 @@ function saveAll() {
     roleTexts: getRoleTexts(),
     state: S,
   };
-  localStorage.setItem('natsuku_wp', JSON.stringify(data));
+  try { localStorage.setItem('natsuku_wp', JSON.stringify(data)); } catch(e) {}
   const btn = document.querySelector('.btn-save');
   btn.classList.add('saved');
   setTimeout(()=>btn.classList.remove('saved'), 1500);
@@ -897,7 +897,9 @@ function saveAll() {
 function v(id) { const el=document.getElementById(id); return el?el.value:''; }
 function sv(id, val) { const el=document.getElementById(id); if(el) el.value=val||''; }
 function loadAll() {
-  const raw = localStorage.getItem('natsuku_wp');
+  let raw;
+  try { raw = localStorage.getItem('natsuku_wp'); } catch(e) {}
+  if (!raw && window.__NATSUKU_SEED) raw = window.__NATSUKU_SEED;
   if (!raw) return;
   try {
     const d = JSON.parse(raw);
@@ -1584,11 +1586,12 @@ function downloadHTML() {
     const clone=document.documentElement.cloneNode(true);
     clone.querySelectorAll('.overlay.show, #toast.show').forEach(el=>el.classList.remove('show'));
     const sb=clone.querySelector('.btn-save.saved'); if(sb) sb.classList.remove('saved');
-    // Seed the recipient's localStorage once so they can keep editing across reloads
+    // Embed saved data as a global variable so the exported file loads data
+    // even when localStorage is unavailable (e.g. file:// in Safari)
     const safe=JSON.stringify(savedData).replace(/</g,'\\u003c');
     const seed=document.createElement('script');
-    seed.textContent='try{if(!localStorage.getItem("natsuku_wp"))localStorage.setItem("natsuku_wp",'+safe+');}catch(e){}';
-    clone.querySelector('head').appendChild(seed);
+    seed.textContent='window.__NATSUKU_SEED='+safe+';try{if(!localStorage.getItem("natsuku_wp"))localStorage.setItem("natsuku_wp",'+safe+');}catch(e){}';
+    clone.querySelector('head').prepend(seed);
     const html='<!DOCTYPE html>\n'+clone.outerHTML;
     const p1n=v('p1')||'Partner 1', p2n=v('p2')||'Partner 2';
     const blob=new Blob([html],{type:'text/html'});

@@ -461,6 +461,27 @@ hr.div{border:none;border-top:1px solid var(--border);margin:.75rem 0}
 .btn-pnav:active{background:#2e3a32;color:var(--cream)}
 .btn-pnav:disabled{opacity:.22;pointer-events:none}
 
+/* ── SNAPPY TOUCH FEEDBACK ───────────────── */
+.btn:active,.btn-pnav:active{transform:scale(.97)}
+.chip:active{transform:scale(.93)}
+.nav-btn:active{background:rgba(241,237,221,.08)}
+.btn-save:active{transform:scale(.96)}
+.vendor-header:active,.budget-item-left:active,.budget-item-right:active,.outfit-row-top:active,.itin-event:active,.itin-time:active,.itin-part:active{opacity:.72}
+.check-item-name:active{opacity:.7}
+.btn-sm{padding:.4rem .8rem;font-size:.6rem;min-height:36px}
+/* ── INLINE CUSTOM TASK ──────────────────── */
+.check-custom .check-item{align-items:center}
+.check-custom-input{
+  border:none;border-bottom:1px solid var(--border);background:transparent;
+  color:var(--td);font-family:'Jost',sans-serif;font-size:.85rem;
+  padding:.25rem 0;outline:none;width:100%;min-height:34px;
+  transition:border-color .18s;
+}
+.check-custom-input:focus{border-color:var(--sienna)}
+/* ── MOBILE: prevent iOS focus-zoom ──────── */
+@media (max-width:819px){
+  input,select,textarea{font-size:16px !important}
+}
 /* ── DESKTOP RESPONSIVE ──────────────────── */
 @media (min-width:820px){
   :root{--sidebar-w:210px;--nav-h:0px}
@@ -847,7 +868,9 @@ const S = {
   vendors: [],
   partyMembers: [],
   outfitRows: [],
+  customTasks: [],
 };
+function escAttr(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 /* ═══════════════════════ TABS ═══════════════════════ */
 const TAB_NAMES=['Overview','Checklist','Itinerary','Budget','Vendors','Outfits','Roles','Notes'];
 let currentTab=0;
@@ -855,7 +878,7 @@ function switchTab(i){
   currentTab=i;
   document.querySelectorAll('.pane').forEach((p,j)=>p.classList.toggle('active',j===i));
   document.querySelectorAll('.nav-btn').forEach((b,j)=>b.classList.toggle('active',j===i));
-  window.scrollTo(0,0);
+  window.scrollTo({top:0,left:0,behavior:'instant'});
   updatePaneNav(i);
 }
 function updatePaneNav(i){
@@ -873,8 +896,8 @@ function showToast(msg='Saved ✓') {
   setTimeout(()=>t.classList.remove('show'), 2000);
 }
 /* ═══════════════════════ SAVE / LOAD ════════════════ */
-function saveAll() {
-  const data = {
+function buildData() {
+  return {
     p1: v('p1'), p2: v('p2'), wDate: v('wDate'), wVenue: v('wVenue'),
     coupleNotes: v('coupleNotes'), totalBudget: v('totalBudget'), guestCount: v('guestCount'),
     cashOut: v('cashOut'), cashIn: v('cashIn'),
@@ -888,12 +911,20 @@ function saveAll() {
     roleTexts: getRoleTexts(),
     state: S,
   };
-  try { localStorage.setItem('natsuku_wp', JSON.stringify(data)); } catch(e) {}
-  const btn = document.querySelector('.btn-save');
-  btn.classList.add('saved');
-  setTimeout(()=>btn.classList.remove('saved'), 1500);
-  showToast('Saved ✓');
 }
+function persist() {
+  try { localStorage.setItem('natsuku_wp', JSON.stringify(buildData())); } catch(e) {}
+}
+function flashSaved(dur) {
+  const btn = document.querySelector('.btn-save');
+  if (!btn) return;
+  btn.classList.add('saved');
+  setTimeout(()=>btn.classList.remove('saved'), dur||1500);
+}
+/* Manual save (button) — persists + confirms with a toast */
+function saveAll() { persist(); flashSaved(1500); showToast('Saved ✓'); }
+/* Silent background save — no toast, just a subtle dot */
+function autoSave() { persist(); flashSaved(900); }
 function v(id) { const el=document.getElementById(id); return el?el.value:''; }
 function sv(id, val) { const el=document.getElementById(id); if(el) el.value=val||''; }
 function loadAll() {
@@ -921,6 +952,7 @@ function loadAll() {
     renderVendors();
     renderParty();
     renderOutfits();
+    renderCustomTasks();
   } catch(e) { console.warn('Load error', e); }
 }
 function getCheckStates() {
@@ -947,7 +979,7 @@ function restoreRoleTexts(texts) {
 }
 /* ─── auto-save on input ─── */
 let saveTimer;
-document.addEventListener('input', ()=>{ clearTimeout(saveTimer); saveTimer=setTimeout(saveAll,1500); });
+document.addEventListener('input', ()=>{ clearTimeout(saveTimer); saveTimer=setTimeout(autoSave,700); });
 /* ═══════════════════════ COUNTDOWN ══════════════════ */
 function updateCountdown() {
   const dateVal = v('wDate');
@@ -1062,6 +1094,7 @@ const TASKS = [
 ];
 function initChecklist() {
   const el = document.getElementById('checklistCt');
+  el.innerHTML = '';
   TASKS.forEach((group,gi)=>{
     const g = document.createElement('div');
     g.className='check-group';
@@ -1080,13 +1113,18 @@ function initChecklist() {
         </div>`;
       g.appendChild(row);
     });
+    const custom = document.createElement('div');
+    custom.className = 'check-custom';
+    custom.dataset.gi = gi;
+    g.appendChild(custom);
     const addBtn = document.createElement('div');
     addBtn.className = 'action-row';
     addBtn.style.cssText = 'margin-top:.3rem;margin-bottom:.3rem';
-    addBtn.innerHTML = `<button class="btn secondary" onclick="addCustomTask(${gi})" style="padding:.4rem .8rem;font-size:.6rem">+ Custom Task</button>`;
+    addBtn.innerHTML = `<button class="btn secondary btn-sm" onclick="addCustomTask(${gi})">+ Custom Task</button>`;
     g.appendChild(addBtn);
     el.appendChild(g);
   });
+  renderCustomTasks();
   updateCheckProgress();
 }
 function updateCheckProgress() {
@@ -1097,23 +1135,42 @@ function updateCheckProgress() {
   document.getElementById('checkLabel').textContent=`${done.length} of ${all.length} tasks`;
   document.getElementById('checkPct').textContent=pct+'%';
 }
-function addCustomTask(gi) {
-  const name=prompt('Task name:'); if(!name) return;
-  const tip=prompt('Tip (optional):')||'';
-  const g=document.querySelector(`#checklistCt .check-group[data-gi="${gi}"]`);
-  if(!g) return;
-  const id='chk-custom-'+Date.now();
-  const row=document.createElement('div');
-  row.className='check-item';
-  row.innerHTML=`
-    <input type="checkbox" id="${id}" onchange="updateCheckProgress()"/>
-    <div class="check-item-body">
-      <label for="${id}" class="check-item-name">${name}</label>
-      ${tip?`<div class="check-item-tip">${tip}</div>`:''}
-    </div>`;
-  const addBtnRow = g.querySelector('.action-row');
-  g.insertBefore(row, addBtnRow);
+function renderCustomTasks() {
+  document.querySelectorAll('.check-custom').forEach(c=>{ c.innerHTML=''; });
+  S.customTasks.forEach(task=>{
+    const c=document.querySelector(`.check-custom[data-gi="${task.gi}"]`);
+    if(!c) return;
+    const row=document.createElement('div');
+    row.className='check-item';
+    row.innerHTML=`
+      <input type="checkbox" id="chk-${task.id}" ${task.done?'checked':''} onchange="toggleCustomTask('${task.id}',this.checked)"/>
+      <div class="check-item-body">
+        <input class="check-custom-input" type="text" value="${escAttr(task.name)}" placeholder="Your task…" oninput="renameCustomTask('${task.id}',this.value)"/>
+      </div>
+      <button class="btn-icon" title="Remove task" onclick="removeCustomTask('${task.id}')">✕</button>`;
+    c.appendChild(row);
+  });
   updateCheckProgress();
+}
+function addCustomTask(gi) {
+  const id='ct'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+  S.customTasks.push({id, gi, name:'', done:false});
+  renderCustomTasks();
+  const c=document.querySelector(`.check-custom[data-gi="${gi}"]`);
+  const input=c?c.querySelector('.check-item:last-child .check-custom-input'):null;
+  if(input) input.focus();
+  persist();
+}
+function toggleCustomTask(id,done) {
+  const t=S.customTasks.find(t=>t.id===id); if(t) t.done=done;
+  updateCheckProgress(); updateCountdown(); persist();
+}
+function renameCustomTask(id,val) {
+  const t=S.customTasks.find(t=>t.id===id); if(t) t.name=val;
+}
+function removeCustomTask(id) {
+  S.customTasks=S.customTasks.filter(t=>t.id!==id);
+  renderCustomTasks(); updateCountdown(); persist();
 }
 /* ═══════════════════════ ITINERARY ══════════════════ */
 const DEFAULT_ITIN = [
@@ -1372,6 +1429,7 @@ function renderBudget() {
               </select>
             </div>
           </div>
+          <div class="field"><label>Category</label><input type="text" value="${escAttr(row.cat||'')}" placeholder="e.g. Venue & Catering" onchange="S.budgetRows[${i}].cat=this.value;renderBudget()"/></div>
           <div class="two-col">
             <div class="field"><label>Allocated ($)</label><input type="number" value="${row.alloc||''}" placeholder="0" onchange="S.budgetRows[${i}].alloc=parseFloat(this.value)||0;renderBudget();updateBudgetSummary();updateOverviewBudget()"/></div>
             <div class="field"><label>Actual Spent ($)</label><input type="number" value="${row.actual||''}" placeholder="0" onchange="S.budgetRows[${i}].actual=parseFloat(this.value)||0;renderBudget();updateBudgetSummary()"/></div>
@@ -1386,13 +1444,17 @@ function renderBudget() {
   updateBudgetSummary();
 }
 function addBudgetItem() {
-  const catNames = [...new Set(S.budgetRows.map(r=>r.cat||'Other')), 'Other'];
-  const catList = catNames.join('\n');
-  const chosen = prompt(`Category (or leave blank for Other):\n\n${catList}`) || 'Other';
-  S.budgetRows.push({item:'', alloc:0, actual:0, status:'pending', cat: chosen});
+  S.budgetRows.push({item:'', alloc:0, actual:0, status:'pending', cat:'📁 Other'});
   renderBudget();
   const items = document.querySelectorAll('.budget-item');
-  items[items.length-1].classList.add('open');
+  const last = items[items.length-1];
+  if (last) {
+    last.classList.add('open');
+    last.scrollIntoView({block:'center', behavior:'smooth'});
+    const nameInput = last.querySelector('.budget-edit input[type=text]');
+    if (nameInput) nameInput.focus();
+  }
+  persist();
 }
 function updateBudgetSummary() {
   const alloc = S.budgetRows.reduce((s,r) => s+(r.alloc||0), 0);

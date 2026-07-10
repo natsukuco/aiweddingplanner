@@ -6,6 +6,11 @@
 <meta name="mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Natsuku"/>
+<meta name="theme-color" content="#3F4F46"/>
+<link rel="manifest" href="manifest.webmanifest"/>
+<link rel="icon" type="image/png" href="icons/icon-192.png"/>
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png"/>
 <title>懐く Wedding Planner</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet"/>
 <style>
@@ -461,6 +466,62 @@ hr.div{border:none;border-top:1px solid var(--border);margin:.75rem 0}
 .btn-pnav:active{background:#2e3a32;color:var(--cream)}
 .btn-pnav:disabled{opacity:.22;pointer-events:none}
 
+/* ── SNAPPY TOUCH FEEDBACK ───────────────── */
+.btn:active,.btn-pnav:active{transform:scale(.97)}
+.chip:active{transform:scale(.93)}
+.nav-btn:active{background:rgba(241,237,221,.08)}
+.btn-save:active{transform:scale(.96)}
+.vendor-header:active,.budget-item-left:active,.budget-item-right:active,.outfit-row-top:active,.itin-event:active,.itin-time:active,.itin-part:active{opacity:.72}
+.check-item-name:active{opacity:.7}
+.btn-sm{padding:.4rem .8rem;font-size:.6rem;min-height:36px}
+/* ── INLINE CUSTOM TASK ──────────────────── */
+.check-custom .check-item{align-items:center}
+.check-custom-input{
+  border:none;border-bottom:1px solid var(--border);background:transparent;
+  color:var(--td);font-family:'Jost',sans-serif;font-size:.85rem;
+  padding:.25rem 0;outline:none;width:100%;min-height:34px;
+  transition:border-color .18s;
+}
+.check-custom-input:focus{border-color:var(--sienna)}
+/* ── MOBILE: prevent iOS focus-zoom ──────── */
+@media (max-width:819px){
+  input,select,textarea{font-size:16px !important}
+}
+/* ── SAVE / SHARE ────────────────────────── */
+.saveshare-card{
+  background:var(--cream);border:1px solid var(--border);border-left:3px solid var(--teal);
+  border-radius:2px;padding:.85rem 1rem;margin-bottom:.85rem;
+}
+.saveshare-title{font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-weight:500;color:var(--forest);margin-bottom:.2rem}
+.saveshare-sub{font-size:.72rem;color:var(--tm);line-height:1.55;margin-bottom:.75rem}
+.saveshare-row{display:flex;gap:.5rem;flex-wrap:wrap}
+.saveshare-row .btn{flex:1;min-width:135px;justify-content:center}
+.modal{
+  display:none;position:fixed;inset:0;z-index:1100;
+  background:rgba(63,79,70,.9);align-items:center;justify-content:center;padding:1.2rem;
+}
+.modal.show{display:flex;animation:fadeUp .2s ease}
+.modal-card{
+  background:var(--parchment);border-radius:4px;max-width:360px;width:100%;
+  padding:1.4rem 1.2rem 1.2rem;max-height:90vh;overflow-y:auto;position:relative;
+  box-shadow:0 12px 40px rgba(0,0,0,.35);
+}
+.modal-close{position:absolute;top:.5rem;right:.6rem;background:none;border:none;font-size:1.4rem;color:var(--tm);cursor:pointer;line-height:1;min-height:38px;min-width:38px}
+.modal-title{font-family:'Cormorant Garamond',serif;font-size:1.45rem;color:var(--forest);margin-bottom:.1rem;line-height:1.1}
+.modal-title em{font-style:italic;color:var(--sienna)}
+.modal-sub{font-size:.6rem;letter-spacing:.14em;color:var(--teal);text-transform:uppercase;margin-bottom:1rem}
+.qr-wrap{display:flex;flex-direction:column;align-items:center;gap:.55rem;background:var(--cream);border:1px solid var(--border);border-radius:3px;padding:1rem;margin-bottom:1rem}
+.qr-wrap canvas{width:180px;height:180px;image-rendering:pixelated;border-radius:2px}
+.qr-cap{font-size:.7rem;color:var(--tm);text-align:center;line-height:1.5}
+.share-link-box{display:flex;gap:.4rem;margin-bottom:.35rem}
+.share-link-box input{
+  flex:1;background:var(--cream);border:1px solid var(--border);border-radius:2px;
+  padding:.55rem .6rem;font-family:'Jost',sans-serif;font-size:.72rem;color:var(--td);outline:none;min-width:0;
+}
+.share-note{font-size:.66rem;color:var(--tm);font-style:italic;line-height:1.55;margin-top:.5rem}
+.hint-list{font-size:.82rem;color:var(--td);line-height:1.8;margin:.4rem 0 .2rem;padding-left:1.15rem}
+.hint-list li{margin-bottom:.25rem}
+.hint-list strong{color:var(--forest)}
 /* ── DESKTOP RESPONSIVE ──────────────────── */
 @media (min-width:820px){
   :root{--sidebar-w:210px;--nav-h:0px}
@@ -558,6 +619,14 @@ hr.div{border:none;border-top:1px solid var(--border);margin:.75rem 0}
     <div style="text-align:right">
       <div style="font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;color:rgba(241,237,221,.4);margin-bottom:3px">Progress</div>
       <div style="font-family:'Cormorant Garamond',serif;font-size:1.3rem" id="cdProgress">0%</div>
+    </div>
+  </div>
+  <div class="saveshare-card pwa-only">
+    <div class="saveshare-title">Keep this planner</div>
+    <div class="saveshare-sub">Install it on your phone for one-tap access, or share a link so your partner sees the same plan.</div>
+    <div class="saveshare-row">
+      <button class="btn" id="installBtn" onclick="installApp()">📲 Save to phone</button>
+      <button class="btn secondary" onclick="openShare()">🔗 Share link</button>
     </div>
   </div>
   <div class="card">
@@ -785,7 +854,9 @@ Timetable with MOH / Best Man</textarea></div>
     <div style="font-size:3.5rem;opacity:.1;font-family:serif;margin-bottom:.5rem">懐く</div>
     <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.2rem;color:var(--forest);margin-bottom:.3rem">to be fondly remembered</div>
     <div style="font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;color:var(--tm)">May your celebration be cherished — Natsuku</div>
-    <div class="action-row" style="justify-content:center;margin-top:1rem">
+    <div class="action-row" style="justify-content:center;margin-top:1rem;flex-wrap:wrap">
+      <button class="btn secondary pwa-only" onclick="openShare()">🔗 Share link</button>
+      <button class="btn secondary pwa-only" onclick="installApp()">📲 Save to phone</button>
       <button class="btn" onclick="downloadHTML()">⬇ Export HTML</button>
     </div>
   </div>
@@ -837,6 +908,34 @@ Timetable with MOH / Best Man</textarea></div>
 </nav>
 <div class="toast" id="toast">Saved ✓</div>
 <div class="overlay" id="overlay"><div class="overlay-text" id="overlayText">Generating HTML…</div></div>
+<!-- SHARE MODAL -->
+<div class="modal pwa-only" id="shareModal">
+  <div class="modal-card">
+    <button class="modal-close" onclick="closeShare()" aria-label="Close">✕</button>
+    <div class="modal-title"><em>Share</em> your plan</div>
+    <div class="modal-sub">Two ways to keep it</div>
+    <div class="qr-wrap">
+      <canvas id="shareQR" width="180" height="180"></canvas>
+      <div class="qr-cap">Scan to open the planner on another phone</div>
+    </div>
+    <div class="share-link-box">
+      <input id="shareLink" type="text" readonly onclick="this.select()"/>
+      <button class="btn" onclick="copyShareLink()">Copy</button>
+    </div>
+    <button class="btn secondary full" id="nativeShareBtn" onclick="nativeShare()" style="display:none">Send to partner…</button>
+    <div class="share-note">This link carries your whole plan — anyone with it can view and copy it. The QR code only opens the planner app.</div>
+  </div>
+</div>
+<!-- INSTALL HINT MODAL -->
+<div class="modal pwa-only" id="installHint">
+  <div class="modal-card">
+    <button class="modal-close" onclick="closeInstallHint()" aria-label="Close">✕</button>
+    <div class="modal-title"><em>Save</em> to your phone</div>
+    <div class="modal-sub">Add to Home Screen</div>
+    <ol class="hint-list" id="installSteps"></ol>
+    <button class="btn full" onclick="closeInstallHint()">Got it</button>
+  </div>
+</div>
 <script>
 'use strict';
 /* ═══════════════════════ STATE ═══════════════════════ */
@@ -847,7 +946,9 @@ const S = {
   vendors: [],
   partyMembers: [],
   outfitRows: [],
+  customTasks: [],
 };
+function escAttr(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 /* ═══════════════════════ TABS ═══════════════════════ */
 const TAB_NAMES=['Overview','Checklist','Itinerary','Budget','Vendors','Outfits','Roles','Notes'];
 let currentTab=0;
@@ -855,7 +956,7 @@ function switchTab(i){
   currentTab=i;
   document.querySelectorAll('.pane').forEach((p,j)=>p.classList.toggle('active',j===i));
   document.querySelectorAll('.nav-btn').forEach((b,j)=>b.classList.toggle('active',j===i));
-  window.scrollTo(0,0);
+  window.scrollTo({top:0,left:0,behavior:'instant'});
   updatePaneNav(i);
 }
 function updatePaneNav(i){
@@ -873,8 +974,8 @@ function showToast(msg='Saved ✓') {
   setTimeout(()=>t.classList.remove('show'), 2000);
 }
 /* ═══════════════════════ SAVE / LOAD ════════════════ */
-function saveAll() {
-  const data = {
+function buildData() {
+  return {
     p1: v('p1'), p2: v('p2'), wDate: v('wDate'), wVenue: v('wVenue'),
     coupleNotes: v('coupleNotes'), totalBudget: v('totalBudget'), guestCount: v('guestCount'),
     cashOut: v('cashOut'), cashIn: v('cashIn'),
@@ -888,12 +989,20 @@ function saveAll() {
     roleTexts: getRoleTexts(),
     state: S,
   };
-  try { localStorage.setItem('natsuku_wp', JSON.stringify(data)); } catch(e) {}
-  const btn = document.querySelector('.btn-save');
-  btn.classList.add('saved');
-  setTimeout(()=>btn.classList.remove('saved'), 1500);
-  showToast('Saved ✓');
 }
+function persist() {
+  try { localStorage.setItem('natsuku_wp', JSON.stringify(buildData())); } catch(e) {}
+}
+function flashSaved(dur) {
+  const btn = document.querySelector('.btn-save');
+  if (!btn) return;
+  btn.classList.add('saved');
+  setTimeout(()=>btn.classList.remove('saved'), dur||1500);
+}
+/* Manual save (button) — persists + confirms with a toast */
+function saveAll() { persist(); flashSaved(1500); showToast('Saved ✓'); }
+/* Silent background save — no toast, just a subtle dot */
+function autoSave() { persist(); flashSaved(900); }
 function v(id) { const el=document.getElementById(id); return el?el.value:''; }
 function sv(id, val) { const el=document.getElementById(id); if(el) el.value=val||''; }
 function loadAll() {
@@ -921,6 +1030,7 @@ function loadAll() {
     renderVendors();
     renderParty();
     renderOutfits();
+    renderCustomTasks();
   } catch(e) { console.warn('Load error', e); }
 }
 function getCheckStates() {
@@ -947,7 +1057,7 @@ function restoreRoleTexts(texts) {
 }
 /* ─── auto-save on input ─── */
 let saveTimer;
-document.addEventListener('input', ()=>{ clearTimeout(saveTimer); saveTimer=setTimeout(saveAll,1500); });
+document.addEventListener('input', ()=>{ clearTimeout(saveTimer); saveTimer=setTimeout(autoSave,700); });
 /* ═══════════════════════ COUNTDOWN ══════════════════ */
 function updateCountdown() {
   const dateVal = v('wDate');
@@ -1062,6 +1172,7 @@ const TASKS = [
 ];
 function initChecklist() {
   const el = document.getElementById('checklistCt');
+  el.innerHTML = '';
   TASKS.forEach((group,gi)=>{
     const g = document.createElement('div');
     g.className='check-group';
@@ -1080,13 +1191,18 @@ function initChecklist() {
         </div>`;
       g.appendChild(row);
     });
+    const custom = document.createElement('div');
+    custom.className = 'check-custom';
+    custom.dataset.gi = gi;
+    g.appendChild(custom);
     const addBtn = document.createElement('div');
     addBtn.className = 'action-row';
     addBtn.style.cssText = 'margin-top:.3rem;margin-bottom:.3rem';
-    addBtn.innerHTML = `<button class="btn secondary" onclick="addCustomTask(${gi})" style="padding:.4rem .8rem;font-size:.6rem">+ Custom Task</button>`;
+    addBtn.innerHTML = `<button class="btn secondary btn-sm" onclick="addCustomTask(${gi})">+ Custom Task</button>`;
     g.appendChild(addBtn);
     el.appendChild(g);
   });
+  renderCustomTasks();
   updateCheckProgress();
 }
 function updateCheckProgress() {
@@ -1097,23 +1213,42 @@ function updateCheckProgress() {
   document.getElementById('checkLabel').textContent=`${done.length} of ${all.length} tasks`;
   document.getElementById('checkPct').textContent=pct+'%';
 }
-function addCustomTask(gi) {
-  const name=prompt('Task name:'); if(!name) return;
-  const tip=prompt('Tip (optional):')||'';
-  const g=document.querySelector(`#checklistCt .check-group[data-gi="${gi}"]`);
-  if(!g) return;
-  const id='chk-custom-'+Date.now();
-  const row=document.createElement('div');
-  row.className='check-item';
-  row.innerHTML=`
-    <input type="checkbox" id="${id}" onchange="updateCheckProgress()"/>
-    <div class="check-item-body">
-      <label for="${id}" class="check-item-name">${name}</label>
-      ${tip?`<div class="check-item-tip">${tip}</div>`:''}
-    </div>`;
-  const addBtnRow = g.querySelector('.action-row');
-  g.insertBefore(row, addBtnRow);
+function renderCustomTasks() {
+  document.querySelectorAll('.check-custom').forEach(c=>{ c.innerHTML=''; });
+  S.customTasks.forEach(task=>{
+    const c=document.querySelector(`.check-custom[data-gi="${task.gi}"]`);
+    if(!c) return;
+    const row=document.createElement('div');
+    row.className='check-item';
+    row.innerHTML=`
+      <input type="checkbox" id="chk-${task.id}" ${task.done?'checked':''} onchange="toggleCustomTask('${task.id}',this.checked)"/>
+      <div class="check-item-body">
+        <input class="check-custom-input" type="text" value="${escAttr(task.name)}" placeholder="Your task…" oninput="renameCustomTask('${task.id}',this.value)"/>
+      </div>
+      <button class="btn-icon" title="Remove task" onclick="removeCustomTask('${task.id}')">✕</button>`;
+    c.appendChild(row);
+  });
   updateCheckProgress();
+}
+function addCustomTask(gi) {
+  const id='ct'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+  S.customTasks.push({id, gi, name:'', done:false});
+  renderCustomTasks();
+  const c=document.querySelector(`.check-custom[data-gi="${gi}"]`);
+  const input=c?c.querySelector('.check-item:last-child .check-custom-input'):null;
+  if(input) input.focus();
+  persist();
+}
+function toggleCustomTask(id,done) {
+  const t=S.customTasks.find(t=>t.id===id); if(t) t.done=done;
+  updateCheckProgress(); updateCountdown(); persist();
+}
+function renameCustomTask(id,val) {
+  const t=S.customTasks.find(t=>t.id===id); if(t) t.name=val;
+}
+function removeCustomTask(id) {
+  S.customTasks=S.customTasks.filter(t=>t.id!==id);
+  renderCustomTasks(); updateCountdown(); persist();
 }
 /* ═══════════════════════ ITINERARY ══════════════════ */
 const DEFAULT_ITIN = [
@@ -1372,6 +1507,7 @@ function renderBudget() {
               </select>
             </div>
           </div>
+          <div class="field"><label>Category</label><input type="text" value="${escAttr(row.cat||'')}" placeholder="e.g. Venue & Catering" onchange="S.budgetRows[${i}].cat=this.value;renderBudget()"/></div>
           <div class="two-col">
             <div class="field"><label>Allocated ($)</label><input type="number" value="${row.alloc||''}" placeholder="0" onchange="S.budgetRows[${i}].alloc=parseFloat(this.value)||0;renderBudget();updateBudgetSummary();updateOverviewBudget()"/></div>
             <div class="field"><label>Actual Spent ($)</label><input type="number" value="${row.actual||''}" placeholder="0" onchange="S.budgetRows[${i}].actual=parseFloat(this.value)||0;renderBudget();updateBudgetSummary()"/></div>
@@ -1386,13 +1522,17 @@ function renderBudget() {
   updateBudgetSummary();
 }
 function addBudgetItem() {
-  const catNames = [...new Set(S.budgetRows.map(r=>r.cat||'Other')), 'Other'];
-  const catList = catNames.join('\n');
-  const chosen = prompt(`Category (or leave blank for Other):\n\n${catList}`) || 'Other';
-  S.budgetRows.push({item:'', alloc:0, actual:0, status:'pending', cat: chosen});
+  S.budgetRows.push({item:'', alloc:0, actual:0, status:'pending', cat:'📁 Other'});
   renderBudget();
   const items = document.querySelectorAll('.budget-item');
-  items[items.length-1].classList.add('open');
+  const last = items[items.length-1];
+  if (last) {
+    last.classList.add('open');
+    last.scrollIntoView({block:'center', behavior:'smooth'});
+    const nameInput = last.querySelector('.budget-edit input[type=text]');
+    if (nameInput) nameInput.focus();
+  }
+  persist();
 }
 function updateBudgetSummary() {
   const alloc = S.budgetRows.reduce((s,r) => s+(r.alloc||0), 0);
@@ -1586,6 +1726,9 @@ function downloadHTML() {
     const clone=document.documentElement.cloneNode(true);
     clone.querySelectorAll('.overlay.show, #toast.show').forEach(el=>el.classList.remove('show'));
     const sb=clone.querySelector('.btn-save.saved'); if(sb) sb.classList.remove('saved');
+    // Strip host-only PWA/share affordances so the standalone file has no broken refs
+    clone.querySelectorAll('.pwa-only').forEach(el=>el.remove());
+    clone.querySelectorAll('link[rel="manifest"], link[rel="apple-touch-icon"], link[rel="icon"], meta[name="theme-color"]').forEach(el=>el.remove());
     // Embed saved data as a global variable so the exported file loads data
     // even when localStorage is unavailable (e.g. file:// in Safari)
     const safe=JSON.stringify(savedData).replace(/</g,'\\u003c');
@@ -1606,8 +1749,176 @@ function downloadHTML() {
   } catch(e){ console.error(e); alert('HTML export failed. Try again.'); }
   ov.classList.remove('show');
 }
+/* ═══════════════════════ QR ENCODER ══════════════════
+   Byte mode, ECC level M, versions 1-10. Self-contained (no external lib).
+   Verified bit-for-bit against the `qrcode` reference library across all
+   versions and masks. Encodes the short app URL for the share modal. */
+const QRGEN=(function(){
+  const EXP=new Array(512),LOG=new Array(256);
+  (function(){let x=1;for(let i=0;i<255;i++){EXP[i]=x;LOG[x]=i;x<<=1;if(x&0x100)x^=0x11d;}for(let i=255;i<512;i++)EXP[i]=EXP[i-255];})();
+  const gmul=(a,b)=>(a===0||b===0)?0:EXP[LOG[a]+LOG[b]];
+  function rsGenPoly(deg){let r=[1];for(let i=0;i<deg;i++){const n=new Array(r.length+1).fill(0);for(let j=0;j<r.length;j++){n[j]^=gmul(r[j],EXP[i]);n[j+1]^=r[j];}r=n;}return r;}
+  function rsEC(data,ecLen){const gen=rsGenPoly(ecLen).slice().reverse();const res=new Array(ecLen).fill(0);for(let i=0;i<data.length;i++){const f=data[i]^res[0];res.shift();res.push(0);if(f!==0)for(let j=0;j<ecLen;j++)res[j]^=gmul(gen[j+1],f);}return res;}
+  const BM={1:[10,1,16,0,0],2:[16,1,28,0,0],3:[26,1,44,0,0],4:[18,2,32,0,0],5:[24,2,43,0,0],6:[16,4,27,0,0],7:[18,4,31,0,0],8:[22,2,38,2,39],9:[22,3,36,2,37],10:[26,4,43,1,44]};
+  const ALIGN={1:[],2:[6,18],3:[6,22],4:[6,26],5:[6,30],6:[6,34],7:[6,22,38],8:[6,24,42],9:[6,26,46],10:[6,28,50]};
+  const dataCw=v=>{const b=BM[v];return b[1]*b[2]+b[3]*b[4];};
+  const gb=(x,i)=>(x>>>i)&1;
+  function encodeBytes(text,ver){
+    const bytes=Array.from(new TextEncoder().encode(text));
+    const cap=dataCw(ver)*8,cci=ver<10?8:16,need=4+cci+8*bytes.length;
+    if(need>cap)return null;
+    const bits=[];const push=(val,len)=>{for(let i=len-1;i>=0;i--)bits.push((val>>>i)&1);};
+    push(0b0100,4);push(bytes.length,cci);for(const b of bytes)push(b,8);
+    push(0,Math.min(4,cap-bits.length));
+    while(bits.length%8!==0)bits.push(0);
+    const pads=[0xEC,0x11];let p=0;while(bits.length<cap){push(pads[p%2],8);p++;}
+    const cw=[];for(let i=0;i<bits.length;i+=8){let v=0;for(let j=0;j<8;j++)v=(v<<1)|bits[i+j];cw.push(v);}
+    return cw;
+  }
+  function interleave(cw,ver){
+    const b=BM[ver],ecLen=b[0],g1n=b[1],g1d=b[2],g2n=b[3],g2d=b[4],blocks=[];let idx=0;
+    for(let i=0;i<g1n;i++){const d=cw.slice(idx,idx+g1d);idx+=g1d;blocks.push({d,ec:rsEC(d,ecLen)});}
+    for(let i=0;i<g2n;i++){const d=cw.slice(idx,idx+g2d);idx+=g2d;blocks.push({d,ec:rsEC(d,ecLen)});}
+    const out=[],maxD=Math.max(g1d,g2d);
+    for(let i=0;i<maxD;i++)for(const bl of blocks)if(i<bl.d.length)out.push(bl.d[i]);
+    for(let i=0;i<ecLen;i++)for(const bl of blocks)out.push(bl.ec[i]);
+    return out;
+  }
+  function buildMatrix(ver,codewords,mask){
+    const size=ver*4+17;
+    const mod=Array.from({length:size},()=>new Array(size).fill(false));
+    const fn=Array.from({length:size},()=>new Array(size).fill(false));
+    const set=(x,y,v)=>{mod[y][x]=v;fn[y][x]=true;};
+    const finder=(cx,cy)=>{for(let dy=-4;dy<=4;dy++)for(let dx=-4;dx<=4;dx++){const x=cx+dx,y=cy+dy;if(x<0||x>=size||y<0||y>=size)continue;const d=Math.max(Math.abs(dx),Math.abs(dy));set(x,y,d!==2&&d!==4);}};
+    finder(3,3);finder(size-4,3);finder(3,size-4);
+    for(let i=0;i<size;i++){if(!fn[6][i])set(i,6,i%2===0);if(!fn[i][6])set(6,i,i%2===0);}
+    const pos=ALIGN[ver],last=pos.length-1;
+    for(let a=0;a<pos.length;a++)for(let bb=0;bb<pos.length;bb++){if((a===0&&bb===0)||(a===0&&bb===last)||(a===last&&bb===0))continue;const cx=pos[a],cy=pos[bb];for(let dy=-2;dy<=2;dy++)for(let dx=-2;dx<=2;dx++)set(cx+dx,cy+dy,Math.max(Math.abs(dx),Math.abs(dy))!==1);}
+    set(8,size-8,true);
+    for(let i=0;i<=8;i++){if(!fn[i][8])set(8,i,false);if(!fn[8][i])set(i,8,false);}
+    for(let i=0;i<8;i++){if(!fn[8][size-1-i])set(size-1-i,8,false);}
+    for(let i=0;i<8;i++){if(!fn[size-1-i][8])set(8,size-1-i,false);}
+    if(ver>=7){for(let i=0;i<18;i++){const a=size-11+i%3,bb=Math.floor(i/3);if(!fn[bb][a])set(a,bb,false);if(!fn[a][bb])set(bb,a,false);}}
+    let bi=0;const totalBits=codewords.length*8;
+    for(let right=size-1;right>=1;right-=2){if(right===6)right=5;for(let vert=0;vert<size;vert++)for(let j=0;j<2;j++){const x=right-j;const up=((right+1)&2)===0;const y=up?size-1-vert:vert;if(!fn[y][x]&&bi<totalBits){mod[y][x]=gb(codewords[bi>>3],7-(bi&7))!==0;bi++;}}}
+    const mfn=(m,x,y)=>{switch(m){case 0:return (x+y)%2===0;case 1:return y%2===0;case 2:return x%3===0;case 3:return (x+y)%3===0;case 4:return (Math.floor(x/3)+Math.floor(y/2))%2===0;case 5:return ((x*y)%2)+((x*y)%3)===0;case 6:return (((x*y)%2)+((x*y)%3))%2===0;default:return (((x+y)%2)+((x*y)%3))%2===0;}};
+    for(let y=0;y<size;y++)for(let x=0;x<size;x++)if(!fn[y][x]&&mfn(mask,x,y))mod[y][x]=!mod[y][x];
+    const fdata=(0<<3)|mask;let rem=fdata;for(let i=0;i<10;i++)rem=(rem<<1)^(((rem>>9)&1)*0x537);
+    const fbits=(((fdata<<10)|rem)^0x5412)&0x7fff;
+    for(let i=0;i<=5;i++)set(8,i,!!gb(fbits,i));
+    set(8,7,!!gb(fbits,6));set(8,8,!!gb(fbits,7));set(7,8,!!gb(fbits,8));
+    for(let i=9;i<15;i++)set(14-i,8,!!gb(fbits,i));
+    for(let i=0;i<8;i++)set(size-1-i,8,!!gb(fbits,i));
+    for(let i=8;i<15;i++)set(8,size-15+i,!!gb(fbits,i));
+    set(8,size-8,true);
+    if(ver>=7){let vr=ver;for(let i=0;i<12;i++)vr=(vr<<1)^(((vr>>11)&1)*0x1f25);const vbits=((ver<<12)|vr);for(let i=0;i<18;i++){const bit=!!gb(vbits,i);const a=size-11+i%3,bb=Math.floor(i/3);set(a,bb,bit);set(bb,a,bit);}}
+    return {size,mod};
+  }
+  function penalty(size,mod){
+    let p=0;
+    const run=(get)=>{let s=0;for(let a=0;a<size;a++){let c=get(a,0),len=1;for(let b=1;b<size;b++){const v=get(a,b);if(v===c)len++;else{if(len>=5)s+=len-2;c=v;len=1;}}if(len>=5)s+=len-2;}return s;};
+    p+=run((a,b)=>mod[a][b]);p+=run((a,b)=>mod[b][a]);
+    for(let y=0;y<size-1;y++)for(let x=0;x<size-1;x++){const v=mod[y][x];if(v===mod[y][x+1]&&v===mod[y+1][x]&&v===mod[y+1][x+1])p+=3;}
+    const pat1=[true,false,true,true,true,false,true,false,false,false,false];
+    const pat2=[false,false,false,false,true,false,true,true,true,false,true];
+    const chk=(get)=>{let s=0;for(let a=0;a<size;a++)for(let b=0;b<=size-11;b++){let m1=true,m2=true;for(let k=0;k<11;k++){const v=get(a,b+k);if(v!==pat1[k])m1=false;if(v!==pat2[k])m2=false;}if(m1)s+=40;if(m2)s+=40;}return s;};
+    p+=chk((a,b)=>mod[a][b]);p+=chk((a,b)=>mod[b][a]);
+    let dark=0;for(let y=0;y<size;y++)for(let x=0;x<size;x++)if(mod[y][x])dark++;
+    p+=Math.floor(Math.abs(dark*100/(size*size)-50)/5)*10;
+    return p;
+  }
+  return function makeQR(text){
+    let ver=0;for(let v=1;v<=10;v++){if(encodeBytes(text,v)){ver=v;break;}}
+    if(!ver)throw new Error('QR: text too long');
+    const codewords=interleave(encodeBytes(text,ver),ver);
+    let best=null;
+    for(let m=0;m<8;m++){const r=buildMatrix(ver,codewords,m);const pen=penalty(r.size,r.mod);if(!best||pen<best.pen)best={size:r.size,mod:r.mod,mask:m,pen};}
+    return {size:best.size,mod:best.mod,version:ver,mask:best.mask};
+  };
+})();
+/* ═══════════════════════ SHARE + INSTALL (PWA) ═══════ */
+function b64u(bytes){let s='';for(let i=0;i<bytes.length;i++)s+=String.fromCharCode(bytes[i]);return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');}
+function unb64u(str){str=str.replace(/-/g,'+').replace(/_/g,'/');const bin=atob(str);const b=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)b[i]=bin.charCodeAt(i);return b;}
+async function encodePlan(){
+  const json=JSON.stringify(buildData());
+  if(typeof CompressionStream!=='undefined'){
+    const buf=await new Response(new Blob([json]).stream().pipeThrough(new CompressionStream('gzip'))).arrayBuffer();
+    return 'g'+b64u(new Uint8Array(buf));
+  }
+  return 'j'+b64u(new TextEncoder().encode(json));
+}
+async function decodePlan(payload){
+  const flag=payload[0],bytes=unb64u(payload.slice(1));
+  if(flag==='g'){const buf=await new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'))).arrayBuffer();return new TextDecoder().decode(buf);}
+  return new TextDecoder().decode(bytes);
+}
+async function buildShareURL(){return location.origin+location.pathname+'#plan='+await encodePlan();}
+async function maybeLoadSharedPlan(){
+  const m=(location.hash||'').match(/plan=([^&]+)/);
+  if(!m)return;
+  let json;
+  try{json=await decodePlan(m[1]);JSON.parse(json);}catch(e){return;}
+  let hasLocal=false;try{hasLocal=!!localStorage.getItem('natsuku_wp');}catch(e){}
+  if(hasLocal&&!confirm('Open this shared plan? It will replace the plan saved on this device.')){
+    history.replaceState(null,'',location.pathname+location.search);return;
+  }
+  try{localStorage.setItem('natsuku_wp',json);}catch(e){window.__NATSUKU_SEED=json;}
+  history.replaceState(null,'',location.pathname+location.search);
+}
+function renderQR(canvas,text){
+  const q=QRGEN(text),size=q.size,mod=q.mod,quiet=4;
+  const scale=Math.max(2,Math.floor(200/(size+quiet*2)));
+  const dim=(size+quiet*2)*scale;
+  canvas.width=dim;canvas.height=dim;
+  const ctx=canvas.getContext('2d');
+  ctx.fillStyle='#F4EEDC';ctx.fillRect(0,0,dim,dim);
+  ctx.fillStyle='#3F4F46';
+  for(let y=0;y<size;y++)for(let x=0;x<size;x++)if(mod[y][x])ctx.fillRect((x+quiet)*scale,(y+quiet)*scale,scale,scale);
+}
+async function openShare(){
+  let url;
+  try{url=await buildShareURL();}catch(e){url=location.origin+location.pathname;}
+  document.getElementById('shareLink').value=url;
+  try{renderQR(document.getElementById('shareQR'),location.origin+location.pathname);}catch(e){}
+  const nb=document.getElementById('nativeShareBtn');
+  if(nb)nb.style.display=(navigator.share?'':'none');
+  document.getElementById('shareModal').classList.add('show');
+}
+function closeShare(){document.getElementById('shareModal').classList.remove('show');}
+async function copyShareLink(){
+  const el=document.getElementById('shareLink');
+  try{await navigator.clipboard.writeText(el.value);showToast('Link copied ✓');}
+  catch(e){el.focus();el.select();try{document.execCommand('copy');showToast('Link copied ✓');}catch(_){showToast('Copy failed — long-press to copy');}}
+}
+async function nativeShare(){
+  const url=document.getElementById('shareLink').value;
+  if(navigator.share){try{await navigator.share({title:'Our Wedding Plan',url});}catch(e){}}
+  else copyShareLink();
+}
+let deferredPrompt=null;
+function isStandalone(){return matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;}
+function isIOS(){return /iP(hone|ad|od)/.test(navigator.platform||navigator.userAgent||'')||((navigator.platform||'')==='MacIntel'&&navigator.maxTouchPoints>1);}
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;});
+window.addEventListener('appinstalled',()=>{deferredPrompt=null;showToast('Installed ✓');});
+function installApp(){
+  if(deferredPrompt){deferredPrompt.prompt();deferredPrompt.userChoice.finally(()=>{deferredPrompt=null;});return;}
+  const steps=document.getElementById('installSteps');
+  if(isIOS()){
+    steps.innerHTML='<li>Tap the <strong>Share</strong> icon in Safari’s toolbar.</li><li>Choose <strong>Add to Home Screen</strong>.</li><li>Tap <strong>Add</strong> — the planner appears as an app.</li>';
+  }else{
+    steps.innerHTML='<li>Open your browser menu (⋮ or ≡).</li><li>Choose <strong>Install app</strong> or <strong>Add to Home screen</strong>.</li><li>Confirm — the planner opens like an app.</li>';
+  }
+  document.getElementById('installHint').classList.add('show');
+}
+function closeInstallHint(){document.getElementById('installHint').classList.remove('show');}
+if('serviceWorker' in navigator && location.protocol.indexOf('http')===0){
+  window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{});});
+}
+/* close modals on backdrop click */
+document.addEventListener('click',e=>{ if(e.target.classList&&e.target.classList.contains('modal'))e.target.classList.remove('show'); });
 /* ═══════════════════════ INIT ═══════════════════════ */
-document.addEventListener('DOMContentLoaded',()=>{
+document.addEventListener('DOMContentLoaded',async ()=>{
+  if(isStandalone())document.querySelectorAll('button[onclick="installApp()"]').forEach(b=>{b.style.display='none';});
   initPriChips();
   initChecklist();
   initBudget();
@@ -1615,6 +1926,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   initVendors();
   initOutfits();
   initParty();
+  await maybeLoadSharedPlan();
   loadAll();
   updateCountdown();
   updateOverviewBudget();

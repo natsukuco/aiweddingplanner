@@ -1,0 +1,17 @@
+{
+  "name": "Natsuku Wedding Planner",
+  "short_name": "Natsuku",
+  "description": "A personal wedding planner — checklist, budget, itinerary, vendors and more.",
+  "lang": "en",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F1EDDD",
+  "theme_color": "#3F4F46",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

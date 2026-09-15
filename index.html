@@ -20,6 +20,7 @@
   --sl:rgba(161,130,107,.15); --fl:rgba(63,79,70,.08); --tl:rgba(34,77,91,.10);
   --td:#2a2a25; --tm:#5a5a52; --border:rgba(161,130,107,.22);
   --nav-h:64px; --safe-b:env(safe-area-inset-bottom,0px);
+  --hdr-h:66px;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html{scroll-behavior:smooth}
@@ -27,7 +28,7 @@ body{
   background:var(--parchment);color:var(--td);
   font-family:'Jost',sans-serif;font-weight:300;
   min-height:100vh;overflow-x:hidden;
-  padding-bottom:calc(var(--nav-h) + var(--safe-b) + 54px);
+  padding-bottom:calc(var(--nav-h) + var(--safe-b) + 14px);
 }
 body::before{
   content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;
@@ -38,55 +39,10 @@ body::before{
 /* ── HEADER ─────────────────────────────── */
 .top-bar{
   background:var(--forest);color:var(--cream);
-  padding:.9rem 1.1rem .75rem;
-  display:flex;align-items:center;justify-content:space-between;
+  padding:.75rem 1.1rem;min-height:var(--hdr-h);
+  display:flex;align-items:center;justify-content:space-between;gap:.75rem;
   position:sticky;top:0;z-index:100;
   box-shadow:0 2px 12px rgba(0,0,0,.18);
-}
-.top-bar-left h1{
-  font-family:'Cormorant Garamond',serif;font-size:1.35rem;
-  font-weight:400;letter-spacing:.02em;line-height:1;
-}
-.top-bar-left h1 em{font-style:italic;opacity:.75}
-.top-bar-left .kanji{
-  font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;
-  color:rgba(241,237,221,.4);margin-top:2px;
-}
-.btn-save{
-  background:var(--sienna);color:var(--cream);border:none;
-  padding:.5rem 1rem;font-family:'Jost',sans-serif;font-size:.65rem;
-  font-weight:500;letter-spacing:.12em;text-transform:uppercase;
-  border-radius:2px;cursor:pointer;white-space:nowrap;
-  min-height:40px;display:flex;align-items:center;gap:.4rem;
-  transition:background .2s;
-}
-.btn-save:active{background:#8e6f5a}
-.btn-save .save-dot{
-  width:6px;height:6px;border-radius:50%;background:var(--cream);
-  opacity:0;transition:opacity .3s;
-}
-.btn-save.saved .save-dot{opacity:1}
-/* ── COUPLE BANNER ───────────────────────── */
-.couple-banner{
-  background:var(--teal);padding:.85rem 1.1rem;
-  display:grid;grid-template-columns:1fr auto 1fr;
-  gap:.6rem;align-items:end;
-}
-.cf{display:flex;flex-direction:column;gap:3px}
-.cf label{font-size:.55rem;letter-spacing:.16em;text-transform:uppercase;color:rgba(241,237,221,.45)}
-.cf input{
-  background:transparent;border:none;border-bottom:1px solid rgba(241,237,221,.25);
-  color:var(--cream);font-family:'Cormorant Garamond',serif;font-size:1rem;
-  padding:.15rem .3rem;outline:none;width:100%;min-height:36px;
-}
-.cf input::placeholder{color:rgba(241,237,221,.25)}
-.couple-sep{
-  font-family:'Cormorant Garamond',serif;font-style:italic;
-  color:var(--sienna);font-size:1.1rem;padding-bottom:.2rem;text-align:center;
-}
-.wedding-meta{
-  background:rgba(34,77,91,.7);padding:.6rem 1.1rem;
-  display:grid;grid-template-columns:1fr 1fr;gap:.6rem;
 }
 /* ── BOTTOM NAV ─────────────────────────── */
 .bottom-nav{
@@ -258,7 +214,7 @@ main{padding:.75rem .85rem 1rem;max-width:640px;margin:0 auto}
 .budget-item.open .budget-edit{display:block}
 /* ── BUDGET SUMMARY STICKY ──────────────── */
 .budget-sticky{
-  position:sticky;top:56px;z-index:90;
+  position:sticky;top:calc(var(--hdr-h) - 1px);z-index:90;
   background:var(--forest);color:var(--cream);
   padding:.6rem 1rem;margin:.0 -.85rem .85rem;
   display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;
@@ -361,21 +317,6 @@ main{padding:.75rem .85rem 1rem;max-width:640px;margin:0 auto}
   margin:.2rem .2rem 0 0;
 }
 .pri-tag button{background:none;border:none;color:var(--tm);cursor:pointer;font-size:.75rem;padding:0 .1rem;line-height:1}
-/* ── WEDDING COUNTDOWN ──────────────────── */
-.countdown-card{
-  background:var(--forest);color:var(--cream);
-  padding:.9rem 1rem;border-radius:2px;margin-bottom:.85rem;
-  display:flex;align-items:center;justify-content:space-between;
-  position:relative;overflow:hidden;
-}
-.countdown-card::after{
-  content:'懐く';position:absolute;right:.5rem;top:50%;
-  transform:translateY(-50%);font-size:4.5rem;opacity:.05;
-  font-family:serif;pointer-events:none;color:var(--cream);
-}
-.countdown-left label{font-size:.55rem;letter-spacing:.16em;text-transform:uppercase;color:rgba(241,237,221,.45);display:block;margin-bottom:3px}
-.countdown-days{font-family:'Cormorant Garamond',serif;font-size:2.2rem;font-weight:400;line-height:1}
-.countdown-unit{font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(241,237,221,.45);margin-left:.3rem}
 /* ── SAVE TOAST ─────────────────────────── */
 .toast{
   position:fixed;bottom:calc(var(--nav-h) + var(--safe-b) + 12px);
@@ -434,43 +375,10 @@ hr.div{border:none;border-top:1px solid var(--border);margin:.75rem 0}
 .tag{display:inline-block;background:var(--tl);border:1px solid rgba(34,77,91,.2);color:var(--teal);font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;padding:.15rem .5rem;border-radius:20px;font-weight:500}
 .empty-state{text-align:center;padding:2rem 1rem;color:var(--tm);font-size:.82rem;font-style:italic}
 
-/* ── PANE NAV BAR ────────────────────────── */
-.pane-nav-bar{
-  position:fixed;
-  bottom:calc(var(--nav-h) + var(--safe-b));
-  left:0;right:0;z-index:190;
-  display:flex;align-items:center;justify-content:space-between;
-  padding:.5rem .85rem;
-  background:var(--cream);
-  border-top:1px solid var(--border);
-  box-shadow:0 -2px 10px rgba(0,0,0,.07);
-}
-.pnb-center{
-  font-size:.52rem;letter-spacing:.13em;text-transform:uppercase;
-  color:var(--tm);text-align:center;flex:1;line-height:1.5;
-}
-.pnb-title{
-  font-family:'Cormorant Garamond',serif;font-style:italic;
-  font-size:.95rem;color:var(--forest);
-  text-transform:none;letter-spacing:.02em;display:block;font-weight:400;
-}
-.btn-pnav{
-  background:none;border:1.5px solid var(--border);border-radius:2px;
-  color:var(--forest);font-family:'Jost',sans-serif;font-size:.58rem;
-  letter-spacing:.1em;text-transform:uppercase;font-weight:500;
-  padding:.4rem .75rem;cursor:pointer;min-height:38px;
-  display:flex;align-items:center;gap:.3rem;
-  transition:background .18s,color .18s,border-color .18s;white-space:nowrap;
-}
-.btn-pnav:hover{background:var(--forest);color:var(--cream);border-color:var(--forest)}
-.btn-pnav:active{background:#2e3a32;color:var(--cream)}
-.btn-pnav:disabled{opacity:.22;pointer-events:none}
-
 /* ── SNAPPY TOUCH FEEDBACK ───────────────── */
-.btn:active,.btn-pnav:active{transform:scale(.97)}
+.btn:active{transform:scale(.97)}
 .chip:active{transform:scale(.93)}
 .nav-btn:active{background:rgba(241,237,221,.08)}
-.btn-save:active{transform:scale(.96)}
 .vendor-header:active,.budget-item-left:active,.budget-item-right:active,.outfit-row-top:active,.itin-event:active,.itin-time:active,.itin-part:active{opacity:.72}
 .check-item-name:active{opacity:.7}
 .btn-sm{padding:.4rem .8rem;font-size:.6rem;min-height:36px}
@@ -522,8 +430,237 @@ hr.div{border:none;border-top:1px solid var(--border);margin:.75rem 0}
 .hint-list{font-size:.82rem;color:var(--td);line-height:1.8;margin:.4rem 0 .2rem;padding-left:1.15rem}
 .hint-list li{margin-bottom:.25rem}
 .hint-list strong{color:var(--forest)}
+/* ═══════════ NEW: COMPACT HEADER ═══════════ */
+.top-bar-right{display:flex;gap:.5rem;align-items:center}
+.save-pill{
+  font-size:.55rem;letter-spacing:.14em;text-transform:uppercase;
+  color:rgba(241,237,221,.35);transition:color .25s;white-space:nowrap;
+}
+.save-pill.saved{color:#9fd0b4}
+.icon-btn{
+  background:rgba(241,237,221,.1);border:none;border-radius:3px;
+  color:var(--cream);cursor:pointer;
+  min-width:44px;min-height:40px;display:flex;align-items:center;
+  justify-content:center;gap:.35rem;padding:0 .7rem;
+  font-family:'Jost',sans-serif;font-size:.6rem;font-weight:500;
+  letter-spacing:.12em;text-transform:uppercase;
+}
+.icon-btn:active{background:rgba(241,237,221,.2)}
+.hdr-couple{
+  font-family:'Cormorant Garamond',serif;font-size:1.3rem;
+  font-weight:400;letter-spacing:.01em;line-height:1.1;
+}
+.hdr-couple em{font-style:italic;opacity:.75}
+.hdr-sub{
+  font-size:.55rem;letter-spacing:.14em;text-transform:uppercase;
+  color:rgba(241,237,221,.42);margin-top:3px;
+}
+/* ═══════════ NEW: SETUP WIZARD ═══════════ */
+.setup{
+  position:fixed;inset:0;z-index:1200;background:var(--parchment);
+  display:none;flex-direction:column;
+}
+.setup.show{display:flex}
+.setup-top{background:var(--forest);color:var(--cream);padding:1rem 1.1rem .8rem}
+.setup-top-row{display:flex;align-items:center;justify-content:space-between;gap:.75rem}
+.setup-brand{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:400}
+.setup-skip{
+  background:none;border:none;color:rgba(241,237,221,.5);cursor:pointer;
+  font-family:'Jost',sans-serif;font-size:.58rem;letter-spacing:.12em;
+  text-transform:uppercase;padding:.5rem;min-height:40px;
+}
+.setup-skip:active{color:var(--cream)}
+.setup-dots{display:flex;gap:4px;margin-top:.75rem}
+.setup-dot{height:3px;flex:1;background:rgba(241,237,221,.16);border-radius:3px;transition:background .3s}
+.setup-dot.done{background:var(--sienna)}
+.setup-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.setup-body{padding:1.5rem 1.1rem 1.5rem;max-width:520px;margin:0 auto}
+.setup-step{display:none}
+.setup-step.active{display:block;animation:fadeUp .28s ease}
+.setup-eyebrow{font-size:.55rem;letter-spacing:.18em;text-transform:uppercase;color:var(--teal);margin-bottom:.45rem}
+.setup-q{
+  font-family:'Cormorant Garamond',serif;font-size:1.8rem;
+  color:var(--forest);line-height:1.15;margin-bottom:.45rem;font-weight:400;
+}
+.setup-q em{font-style:italic;color:var(--sienna)}
+.setup-help{font-size:.84rem;color:var(--tm);line-height:1.65;margin-bottom:1.35rem}
+.setup-label{
+  font-size:.56rem;letter-spacing:.15em;text-transform:uppercase;
+  color:var(--tm);font-weight:500;display:block;margin-bottom:.35rem;
+}
+.setup-input{
+  width:100%;background:var(--cream);border:1px solid var(--border);
+  border-radius:3px;padding:.8rem .9rem;font-family:'Jost',sans-serif;
+  font-size:1rem;font-weight:300;color:var(--td);outline:none;
+  min-height:54px;margin-bottom:1rem;-webkit-appearance:none;appearance:none;
+  transition:border-color .18s;color-scheme:light;
+}
+.setup-input:focus{border-color:var(--sienna);background:#fff}
+.setup-readout{
+  background:var(--tl);border-left:3px solid var(--teal);
+  padding:.7rem .85rem;border-radius:0 2px 2px 0;margin-bottom:1rem;
+  font-size:.78rem;color:var(--teal);line-height:1.55;
+}
+.setup-readout strong{font-family:'Cormorant Garamond',serif;font-size:1.15rem;font-weight:500}
+.opt-grid{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:1.1rem}
+.opt{
+  background:var(--cream);border:1px solid var(--border);color:var(--td);
+  font-family:'Jost',sans-serif;font-size:.8rem;font-weight:300;
+  padding:.6rem .9rem;border-radius:22px;cursor:pointer;
+  min-height:44px;display:inline-flex;align-items:center;gap:.35rem;
+  transition:background .15s,border-color .15s,color .15s;
+}
+.opt:active{transform:scale(.96)}
+.opt.on{background:var(--forest);border-color:var(--forest);color:var(--cream)}
+.opt.on::after{content:'✓';font-size:.7rem;opacity:.8}
+.setup-foot{
+  background:var(--cream);border-top:1px solid var(--border);
+  padding:.8rem 1.1rem calc(.8rem + var(--safe-b));
+}
+.setup-foot-inner{max-width:520px;margin:0 auto;display:flex;gap:.6rem;align-items:center}
+.setup-foot .btn{flex:1;justify-content:center;min-height:50px}
+.setup-back{
+  background:none;border:1px solid var(--border);color:var(--tm);
+  border-radius:2px;min-height:50px;min-width:54px;cursor:pointer;
+  font-size:1rem;display:flex;align-items:center;justify-content:center;
+}
+.setup-back:disabled{opacity:.25;pointer-events:none}
+/* ═══════════ NEW: HOME DASHBOARD ═══════════ */
+.hero{
+  background:var(--forest);color:var(--cream);border-radius:3px;
+  padding:1.1rem 1.1rem 1rem;margin-bottom:.85rem;position:relative;overflow:hidden;
+}
+.hero::after{
+  content:'懐く';position:absolute;right:-.3rem;top:50%;
+  transform:translateY(-50%);font-size:5.5rem;opacity:.055;
+  font-family:serif;pointer-events:none;
+}
+.hero-names{font-family:'Cormorant Garamond',serif;font-size:1.5rem;line-height:1.15;margin-bottom:.15rem}
+.hero-names em{font-style:italic;opacity:.6;font-size:1.1rem}
+.hero-when{font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(241,237,221,.5)}
+.hero-row{display:flex;align-items:flex-end;gap:1.3rem;margin-top:.95rem;position:relative;z-index:1}
+.hero-stat label{
+  display:block;font-size:.52rem;letter-spacing:.15em;text-transform:uppercase;
+  color:rgba(241,237,221,.42);margin-bottom:2px;
+}
+.hero-num{font-family:'Cormorant Garamond',serif;font-size:2rem;line-height:1;font-weight:400}
+.hero-num small{font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;opacity:.5;margin-left:.25rem;font-family:'Jost',sans-serif}
+.hero-bar{margin-top:.85rem;position:relative;z-index:1}
+.hero-bar-track{background:rgba(241,237,221,.15);height:5px;border-radius:5px;overflow:hidden}
+.hero-bar-fill{height:100%;background:var(--sienna);border-radius:5px;transition:width .45s ease}
+.hero-bar-meta{display:flex;justify-content:space-between;font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(241,237,221,.45);margin-top:.35rem}
+/* next-up list */
+.nextup-item{
+  display:flex;align-items:flex-start;gap:.7rem;width:100%;text-align:left;
+  background:var(--cream);border:1px solid var(--border);border-left:3px solid var(--sienna);
+  border-radius:2px;padding:.75rem .85rem;margin-bottom:.45rem;cursor:pointer;
+  font-family:'Jost',sans-serif;min-height:52px;
+}
+.nextup-item:active{background:#efe7d2}
+.nextup-check{
+  width:20px;height:20px;min-width:20px;border:1.5px solid var(--border);
+  border-radius:3px;margin-top:1px;flex-shrink:0;
+}
+.nextup-body{flex:1;min-width:0}
+.nextup-name{display:block;font-size:.86rem;color:var(--td);line-height:1.4;font-weight:400}
+.nextup-when{display:block;font-size:.62rem;letter-spacing:.09em;text-transform:uppercase;color:var(--sienna);margin-top:3px}
+.nextup-done{
+  text-align:center;padding:1.2rem .5rem;color:var(--tm);font-size:.82rem;
+  font-style:italic;background:var(--cream);border:1px dashed var(--border);border-radius:2px;
+}
+/* budget meter */
+.meter{background:rgba(63,79,70,.1);height:8px;border-radius:8px;overflow:hidden;display:flex}
+.meter-spent{background:var(--teal);height:100%}
+.meter-alloc{background:rgba(161,130,107,.45);height:100%}
+.meter-legend{display:flex;gap:1rem;flex-wrap:wrap;margin-top:.55rem;font-size:.68rem;color:var(--tm)}
+.meter-legend span{display:inline-flex;align-items:center;gap:.35rem}
+.meter-key{width:9px;height:9px;border-radius:2px;display:inline-block}
+/* quick tiles */
+.tiles{display:grid;grid-template-columns:repeat(2,1fr);gap:.5rem;margin-bottom:.85rem}
+.tile{
+  background:var(--cream);border:1px solid var(--border);border-radius:3px;
+  padding:.85rem .8rem;cursor:pointer;text-align:left;
+  font-family:'Jost',sans-serif;min-height:74px;
+  display:flex;flex-direction:column;gap:.2rem;justify-content:center;
+}
+.tile:active{background:#efe7d2;transform:scale(.985)}
+.tile-icon{font-size:1.1rem;line-height:1}
+.tile-name{font-size:.82rem;color:var(--forest);font-weight:400}
+.tile-sub{font-size:.64rem;color:var(--tm);line-height:1.4}
+/* ═══════════ NEW: ACCORDION SECTION ═══════════ */
+.acc{
+  background:var(--cream);border:1px solid var(--border);
+  border-left:3px solid var(--sienna);border-radius:2px;
+  margin-bottom:.6rem;overflow:hidden;
+}
+.acc.teal{border-left-color:var(--teal)}
+.acc.forest{border-left-color:var(--forest)}
+.acc-head{
+  width:100%;background:none;border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:space-between;gap:.6rem;
+  padding:.9rem .95rem;min-height:56px;text-align:left;font-family:'Jost',sans-serif;
+}
+.acc-head:active{background:rgba(161,130,107,.06)}
+.acc-head-txt{min-width:0;flex:1}
+.acc-title{display:block;font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-weight:500;color:var(--forest);line-height:1.2}
+.acc-sub{display:block;font-size:.66rem;color:var(--tm);margin-top:3px;line-height:1.45}
+.acc-caret{color:var(--sienna);font-size:.85rem;transition:transform .22s;flex-shrink:0}
+.acc.open .acc-caret{transform:rotate(180deg)}
+.acc-body{display:none;padding:0 .95rem 1rem}
+.acc.open .acc-body{display:block;animation:fadeUp .2s ease}
+/* ═══════════ NEW: MORE SHEET ═══════════ */
+.sheet{
+  display:none;position:fixed;inset:0;z-index:1100;
+  background:rgba(63,79,70,.55);align-items:flex-end;justify-content:center;
+}
+.sheet.show{display:flex;animation:fadeUp .18s ease}
+.sheet-card{
+  background:var(--parchment);width:100%;max-width:560px;
+  border-radius:12px 12px 0 0;padding:.7rem 1rem calc(1rem + var(--safe-b));
+  max-height:86vh;overflow-y:auto;box-shadow:0 -10px 40px rgba(0,0,0,.3);
+}
+.sheet-handle{width:40px;height:4px;border-radius:4px;background:var(--border);margin:0 auto .9rem}
+.sheet-label{font-size:.55rem;letter-spacing:.17em;text-transform:uppercase;color:var(--tm);margin:.9rem 0 .4rem}
+.sheet-item{
+  width:100%;display:flex;align-items:center;gap:.75rem;
+  background:var(--cream);border:1px solid var(--border);border-radius:2px;
+  padding:.8rem .9rem;margin-bottom:.4rem;cursor:pointer;
+  font-family:'Jost',sans-serif;font-size:.88rem;color:var(--td);
+  text-align:left;min-height:52px;
+}
+.sheet-item:active{background:#efe7d2}
+.sheet-item .si-ico{font-size:1rem;width:22px;text-align:center;flex-shrink:0}
+.sheet-item .si-sub{display:block;font-size:.65rem;color:var(--tm);margin-top:2px}
+.sheet-item.on{border-left:3px solid var(--sienna)}
+/* ═══════════ NEW: IN-FLOW STEP NAV ═══════════ */
+.step-nav{
+  display:flex;gap:.5rem;align-items:stretch;
+  margin:1.25rem 0 .5rem;padding-top:1rem;border-top:1px solid var(--border);
+}
+.btn-step{
+  background:var(--cream);border:1px solid var(--border);border-radius:2px;
+  color:var(--forest);font-family:'Jost',sans-serif;font-size:.7rem;
+  cursor:pointer;min-height:50px;padding:.5rem .9rem;
+  display:flex;flex-direction:column;justify-content:center;gap:2px;
+}
+.btn-step small{font-size:.5rem;letter-spacing:.14em;text-transform:uppercase;color:var(--tm)}
+.btn-step.primary{
+  flex:1;background:var(--forest);border-color:var(--forest);color:var(--cream);align-items:flex-end;
+}
+.btn-step.primary small{color:rgba(241,237,221,.5)}
+.btn-step:active{transform:scale(.98)}
+.btn-step:disabled{opacity:.3;pointer-events:none}
+/* ═══════════ NEW: HELPER TEXT ═══════════ */
+.lead{font-size:.8rem;color:var(--tm);line-height:1.65;margin-bottom:.85rem}
+.sec-head{padding:.4rem 0 .9rem}
+.mini-label{font-size:.55rem;letter-spacing:.16em;text-transform:uppercase;color:var(--sienna);font-weight:500;margin:.15rem 0 .5rem}
+.desk-only{display:none !important}
 /* ── DESKTOP RESPONSIVE ──────────────────── */
 @media (min-width:820px){
+  .tiles{grid-template-columns:repeat(4,1fr)}
+  .setup-body,.setup-foot-inner{max-width:560px}
+  .desk-only{display:flex !important}
+  #navMore{display:none}
   :root{--sidebar-w:210px;--nav-h:0px}
   body{padding-bottom:54px;padding-left:var(--sidebar-w)}
   .bottom-nav{
@@ -554,129 +691,181 @@ hr.div{border:none;border-top:1px solid var(--border);margin:.75rem 0}
   }
   .nav-btn span{font-size:.65rem;letter-spacing:.1em}
   .nav-btn svg{width:18px;height:18px;flex-shrink:0}
-  main{max-width:none;padding:1.5rem 3rem 2rem;margin:0}
-  .budget-sticky{top:60px;margin:0 -3rem .85rem;padding:.6rem 3rem}
-  .pane-nav-bar{left:var(--sidebar-w);bottom:0}
+  main{max-width:920px;padding:1.5rem 3rem 2rem;margin:0 auto}
+  .budget-sticky{margin:0 -3rem .85rem;padding:.6rem 3rem}
   .toast{bottom:12px;left:calc(var(--sidebar-w) + 50%);transform:translateX(-50%) translateY(20px)}
   .toast.show{transform:translateX(-50%) translateY(0)}
   .overlay{left:var(--sidebar-w)}
   .sec-head h2{font-size:2rem}
-  .couple-banner{gap:1rem;padding:.85rem 3rem}
-  .wedding-meta{padding:.6rem 3rem}
   .top-bar{padding:.9rem 3rem .75rem}
+  .sheet{align-items:center}
+  .sheet-card{border-radius:6px;max-width:460px;padding:1.2rem 1.2rem 1.4rem}
+  .setup-q{font-size:2.1rem}
 }
 </style>
 </head>
 <body>
 <!-- HEADER -->
-<div class="top-bar">
+<header class="top-bar">
   <div class="top-bar-left">
-    <h1>懐く <em>Wedding</em></h1>
-    <div class="kanji">fondly remembered · natsuku</div>
+    <div class="hdr-couple" id="hdrNames">懐く <em>Wedding</em></div>
+    <div class="hdr-sub" id="hdrSub">fondly remembered · natsuku</div>
   </div>
-  <div style="display:flex;gap:.5rem;align-items:center;">
-    <button class="btn-save" onclick="downloadHTML()" style="background:rgba(161,130,107,.25);letter-spacing:.1em;">⬇ HTML</button>
-    <button class="btn-save" onclick="saveAll()">
-      <span class="save-dot"></span>Save
-    </button>
+  <div class="top-bar-right">
+    <span class="save-pill" id="savePill">Saved</span>
+    <button class="icon-btn" onclick="openMore()" aria-label="Open menu">⋯ More</button>
   </div>
-</div>
-<!-- COUPLE BANNER -->
-<div class="couple-banner">
-  <div class="cf">
-    <label>Partner 1</label>
-    <input id="p1" type="text" placeholder="Name"/>
-  </div>
-  <div class="couple-sep">&amp;</div>
-  <div class="cf">
-    <label>Partner 2</label>
-    <input id="p2" type="text" placeholder="Name"/>
-  </div>
-</div>
-<div class="wedding-meta">
-  <div class="cf">
-    <label>Wedding Date</label>
-    <input id="wDate" type="date" style="color:var(--cream);background:transparent;border:none;border-bottom:1px solid rgba(241,237,221,.25);padding:.15rem .3rem;outline:none;font-family:'Jost',sans-serif;font-size:.82rem;width:100%;min-height:36px;-webkit-appearance:none;color-scheme:dark;"/>
-  </div>
-  <div class="cf">
-    <label>Venue</label>
-    <input id="wVenue" type="text" placeholder="Venue name" style="color:var(--cream);background:transparent;border:none;border-bottom:1px solid rgba(241,237,221,.25);padding:.15rem .3rem;outline:none;font-family:'Jost',sans-serif;font-size:.82rem;width:100%;min-height:36px;"/>
-  </div>
-</div>
+</header>
 <!-- PANES -->
 <main id="mainContent">
 <!-- ═══ PANE 0: OVERVIEW ═══ -->
 <div class="pane active" id="pane-0">
-  <div class="sec-head"><h2><em>Overview</em></h2><p>Your wedding at a glance</p></div>
-  <div id="countdownCard" class="countdown-card">
-    <div class="countdown-left">
-      <label>Days Until Your Wedding</label>
-      <div>
-        <span class="countdown-days" id="cdDays">—</span>
-        <span class="countdown-unit">days to go</span>
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-names" id="heroNames">Your wedding <em>plan</em></div>
+    <div class="hero-when" id="heroWhen">Tap “Wedding details” to begin</div>
+    <div class="hero-row">
+      <div class="hero-stat">
+        <label>Countdown</label>
+        <div class="hero-num" id="cdDays">—<small>days</small></div>
+      </div>
+      <div class="hero-stat">
+        <label>Tasks done</label>
+        <div class="hero-num" id="cdProgress">0<small>%</small></div>
       </div>
     </div>
-    <div style="text-align:right">
-      <div style="font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;color:rgba(241,237,221,.4);margin-bottom:3px">Progress</div>
-      <div style="font-family:'Cormorant Garamond',serif;font-size:1.3rem" id="cdProgress">0%</div>
+    <div class="hero-bar">
+      <div class="hero-bar-track"><div class="hero-bar-fill" id="heroBar" style="width:0%"></div></div>
+      <div class="hero-bar-meta"><span id="heroBarLabel">0 of 0 tasks</span><span id="heroBarRight">Keep going</span></div>
     </div>
   </div>
+
+  <!-- NEXT UP -->
+  <div class="mini-label">Your next steps</div>
+  <div id="nextUp"></div>
+  <button class="btn secondary full" onclick="switchTab(1)" style="margin-bottom:1.1rem">See all tasks</button>
+
+  <!-- QUICK TILES -->
+  <div class="mini-label">Jump to</div>
+  <div class="tiles">
+    <button class="tile" onclick="switchTab(3)">
+      <span class="tile-icon">💰</span>
+      <span class="tile-name">Budget</span>
+      <span class="tile-sub" id="tileBudget">Not set yet</span>
+    </button>
+    <button class="tile" onclick="switchTab(2)">
+      <span class="tile-icon">🕰</span>
+      <span class="tile-name">Day plan</span>
+      <span class="tile-sub" id="tileItin">Timeline for the day</span>
+    </button>
+    <button class="tile" onclick="switchTab(4)">
+      <span class="tile-icon">🤝</span>
+      <span class="tile-name">Vendors</span>
+      <span class="tile-sub" id="tileVendors">Who you've booked</span>
+    </button>
+    <button class="tile" onclick="switchTab(6)">
+      <span class="tile-icon">👥</span>
+      <span class="tile-name">Helpers</span>
+      <span class="tile-sub" id="tileParty">Who does what</span>
+    </button>
+  </div>
+
+  <!-- WEDDING DETAILS -->
+  <div class="acc" id="accBasics">
+    <button class="acc-head" onclick="toggleAcc('accBasics')" aria-expanded="false">
+      <span class="acc-head-txt">
+        <span class="acc-title">Wedding details</span>
+        <span class="acc-sub">Names, date, venue, guests and budget</span>
+      </span>
+      <span class="acc-caret">▾</span>
+    </button>
+    <div class="acc-body">
+      <div class="two-col">
+        <div class="field"><label>Partner 1</label><input type="text" id="p1" placeholder="First name" autocomplete="off"/></div>
+        <div class="field"><label>Partner 2</label><input type="text" id="p2" placeholder="First name" autocomplete="off"/></div>
+      </div>
+      <div class="two-col">
+        <div class="field"><label>Wedding date</label><input type="date" id="wDate"/></div>
+        <div class="field"><label>Venue</label><input type="text" id="wVenue" placeholder="Where?" autocomplete="off"/></div>
+      </div>
+      <div class="two-col">
+        <div class="field"><label>Total budget (SGD)</label><input type="number" inputmode="numeric" id="totalBudget" placeholder="25000" oninput="updateOverviewBudget()"/></div>
+        <div class="field"><label>Guests expected</label><input type="number" inputmode="numeric" id="guestCount" placeholder="200" oninput="updateOverviewBudget()"/></div>
+      </div>
+      <div class="two-col" style="margin-top:.25rem">
+        <div style="background:var(--parchment);border:1px solid var(--border);border-radius:2px;padding:.55rem .75rem">
+          <div style="font-size:.55rem;letter-spacing:.13em;text-transform:uppercase;color:var(--tm);margin-bottom:2px">Per guest</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:1.3rem;color:var(--teal)" id="perHead">—</div>
+        </div>
+        <div style="background:var(--parchment);border:1px solid var(--border);border-radius:2px;padding:.55rem .75rem">
+          <div style="font-size:.55rem;letter-spacing:.13em;text-transform:uppercase;color:var(--tm);margin-bottom:2px">Already planned</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:1.3rem;color:var(--forest)" id="alreadyBudgeted">—</div>
+        </div>
+      </div>
+      <div class="action-row"><button class="btn secondary full" onclick="openSetup(false)">Redo the guided setup</button></div>
+    </div>
+  </div>
+
+  <!-- WHAT MATTERS MOST -->
+  <div class="acc teal" id="accPri">
+    <button class="acc-head" onclick="toggleAcc('accPri')" aria-expanded="false">
+      <span class="acc-head-txt">
+        <span class="acc-title">What matters most</span>
+        <span class="acc-sub" id="accPriSub">Decide where the money and effort should go</span>
+      </span>
+      <span class="acc-caret">▾</span>
+    </button>
+    <div class="acc-body">
+      <div class="lead">Add anything that's part of your day, then say how much it matters. Things you both care about most should get the biggest share of your budget.</div>
+      <div style="display:flex;gap:.5rem;margin-bottom:.5rem;flex-wrap:wrap">
+        <input type="text" id="priInput" placeholder="e.g. Photography…" class="field-inline" style="flex:1;min-width:120px;border:1px solid var(--border);border-radius:2px;padding:.55rem .65rem;background:var(--parchment);"/>
+        <select id="priImport" style="border:1px solid var(--border);background:var(--parchment);font-family:'Jost',sans-serif;font-size:.78rem;padding:.55rem .65rem;border-radius:2px;outline:none;min-height:44px;color:var(--td);-webkit-appearance:none;appearance:none;min-width:150px">
+          <option value="HH">🔴 Must have</option>
+          <option value="HL">🟡 Important</option>
+          <option value="LH">🟢 Nice to have</option>
+          <option value="LL">⚪ Can skip</option>
+        </select>
+        <button class="btn" onclick="addPriItem()" style="padding:.5rem .95rem">Add</button>
+      </div>
+      <div class="chip-label">Tap to add</div>
+      <div class="chips" id="priChips"></div>
+      <div id="priTags" style="margin-top:.5rem;display:flex;flex-wrap:wrap"></div>
+      <div class="matrix-grid" style="margin-top:.85rem;margin-bottom:0">
+        <div class="quadrant q1"><div class="q-badge">Must have</div><div class="q-name">Spend here</div><div class="q-items" id="q-HH">—</div></div>
+        <div class="quadrant q2"><div class="q-badge">Important</div><div class="q-name">Keep, but simplify</div><div class="q-items" id="q-HL">—</div></div>
+        <div class="quadrant q3"><div class="q-badge">Nice to have</div><div class="q-name">If budget allows</div><div class="q-items" id="q-LH">—</div></div>
+        <div class="quadrant q4"><div class="q-badge">Can skip</div><div class="q-name">Cut without regret</div><div class="q-items" id="q-LL">—</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SHARED NOTES -->
+  <div class="acc forest" id="accNotes0">
+    <button class="acc-head" onclick="toggleAcc('accNotes0')" aria-expanded="false">
+      <span class="acc-head-txt">
+        <span class="acc-title">Notes for the two of you</span>
+        <span class="acc-sub">Agreements, reminders, things not to forget</span>
+      </span>
+      <span class="acc-caret">▾</span>
+    </button>
+    <div class="acc-body">
+      <div class="field"><textarea id="coupleNotes" placeholder="Anything you've agreed on together…"></textarea></div>
+    </div>
+  </div>
+
   <div class="saveshare-card pwa-only">
     <div class="saveshare-title">Keep this planner</div>
-    <div class="saveshare-sub">Install it on your phone for one-tap access, or share a link so your partner sees the same plan.</div>
+    <div class="saveshare-sub">Everything saves on this device automatically. Add it to your home screen, or send your partner a link with the whole plan inside it.</div>
     <div class="saveshare-row">
       <button class="btn" id="installBtn" onclick="installApp()">📲 Save to phone</button>
-      <button class="btn secondary" onclick="openShare()">🔗 Share link</button>
+      <button class="btn secondary" onclick="openShare()">🔗 Share with partner</button>
     </div>
-  </div>
-  <div class="card">
-    <div class="card-title">Priority Matrix</div>
-    <div style="font-size:.75rem;color:var(--tm);margin-bottom:.75rem;line-height:1.6">Add your wedding elements and rate their importance and want.</div>
-    <div style="display:flex;gap:.5rem;margin-bottom:.5rem;flex-wrap:wrap">
-      <input type="text" id="priInput" placeholder="e.g. Photography…" class="field-inline" style="flex:1;min-width:120px;border:1px solid var(--border);border-radius:2px;padding:.5rem .65rem;background:var(--parchment);"/>
-      <select id="priImport" style="border:1px solid var(--border);background:var(--parchment);font-family:'Jost',sans-serif;font-size:.78rem;padding:.5rem .65rem;border-radius:2px;outline:none;min-height:44px;color:var(--td);-webkit-appearance:none;appearance:none;min-width:130px">
-        <option value="HH">🔴 Top Priority</option>
-        <option value="HL">🟡 Important</option>
-        <option value="LH">🟢 Nice to Have</option>
-        <option value="LL">⚪ Reconsider</option>
-      </select>
-      <button class="btn" onclick="addPriItem()" style="padding:.5rem .85rem">+</button>
-    </div>
-    <div class="chip-label">Quick add</div>
-    <div class="chips" id="priChips"></div>
-    <div id="priTags" style="margin-top:.5rem;display:flex;flex-wrap:wrap"></div>
-  </div>
-  <div class="matrix-grid">
-    <div class="quadrant q1"><div class="q-badge">Top Priority</div><div class="q-name">High + High</div><div class="q-items" id="q-HH">—</div></div>
-    <div class="quadrant q2"><div class="q-badge">Important</div><div class="q-name">High + Low</div><div class="q-items" id="q-HL">—</div></div>
-    <div class="quadrant q3"><div class="q-badge">Nice to Have</div><div class="q-name">Low + High</div><div class="q-items" id="q-LH">—</div></div>
-    <div class="quadrant q4"><div class="q-badge">Reconsider</div><div class="q-name">Low + Low</div><div class="q-items" id="q-LL">—</div></div>
-  </div>
-  <div class="card teal">
-    <div class="card-title">Budget Overview</div>
-    <div class="two-col">
-      <div class="field"><label>Total Budget (SGD)</label><input type="number" id="totalBudget" placeholder="25000" oninput="updateOverviewBudget()"/></div>
-      <div class="field"><label>Guest Count</label><input type="number" id="guestCount" placeholder="200" oninput="updateOverviewBudget()"/></div>
-    </div>
-    <div class="two-col" style="margin-top:.25rem">
-      <div style="background:var(--parchment);border:1px solid var(--border);border-radius:2px;padding:.5rem .75rem">
-        <div style="font-size:.55rem;letter-spacing:.13em;text-transform:uppercase;color:var(--tm);margin-bottom:2px">Per head</div>
-        <div style="font-family:'Cormorant Garamond',serif;font-size:1.3rem;color:var(--teal)" id="perHead">—</div>
-      </div>
-      <div style="background:var(--parchment);border:1px solid var(--border);border-radius:2px;padding:.5rem .75rem">
-        <div style="font-size:.55rem;letter-spacing:.13em;text-transform:uppercase;color:var(--tm);margin-bottom:2px">Already budgeted</div>
-        <div style="font-family:'Cormorant Garamond',serif;font-size:1.3rem;color:var(--forest)" id="alreadyBudgeted">—</div>
-      </div>
-    </div>
-  </div>
-  <div class="card forest">
-    <div class="card-title">Couple's Notes</div>
-    <div class="field"><textarea id="coupleNotes" placeholder="Any shared priorities, agreements, or things to remember together…"></textarea></div>
   </div>
 </div>
 <!-- ═══ PANE 1: CHECKLIST ═══ -->
 <div class="pane" id="pane-1">
-  <div class="sec-head"><h2><em>Checklist</em></h2><p>Every task, nothing missed</p></div>
+  <div class="sec-head"><h2>Your <em>to-do</em> list</h2><p>Step 2 of 8 · tick things off as you go</p></div>
+  <div class="lead">Grouped by when they're usually done. Start at the top — you don't need to do them in order, and you can add your own.</div>
   <div class="progress-wrap">
     <div class="progress-meta"><span id="checkLabel">0 of 0 tasks</span><span id="checkPct">0%</span></div>
     <div class="progress-track"><div class="progress-fill" id="checkBar" style="width:0%"></div></div>
@@ -685,9 +874,9 @@ hr.div{border:none;border-top:1px solid var(--border);margin:.75rem 0}
 </div>
 <!-- ═══ PANE 2: ITINERARY ═══ -->
 <div class="pane" id="pane-2">
-  <div class="sec-head"><h2><em>Itinerary</em></h2><p>Day-of timeline</p></div>
+  <div class="sec-head"><h2>The <em>day</em> itself</h2><p>Step 3 of 8 · hour by hour</p></div>
   <div class="info-block forest" style="margin-bottom:.85rem">
-    This itinerary is fully editable — tap any event to edit its details, and drag the ⠿ handle to reorder the sequence.
+    We've started you off with a typical Malay wedding day. <strong style="font-style:normal;color:var(--forest)">Tap any row to change it</strong>, drag the ⠿ handle to move it, or delete what doesn't apply.
   </div>
   <div id="itinList"></div>
   <div class="action-row">
@@ -702,7 +891,7 @@ hr.div{border:none;border-top:1px solid var(--border);margin:.75rem 0}
 </div>
 <!-- ═══ PANE 3: BUDGET ═══ -->
 <div class="pane" id="pane-3">
-  <div class="sec-head"><h2><em>Budget</em></h2><p>Every dollar accounted for</p></div>
+  <div class="sec-head"><h2>Your <em>money</em></h2><p>Step 4 of 8 · planned vs. actually spent</p></div>
   <div class="budget-sticky" id="budgetSticky">
     <div class="bs-item"><label>Allocated</label><div class="val" id="bsAlloc">$0</div></div>
     <div class="bs-item"><label>Spent</label><div class="val" id="bsSpent">$0</div></div>
@@ -715,34 +904,52 @@ hr.div{border:none;border-top:1px solid var(--border);margin:.75rem 0}
       <div class="budget-warning-msg">Your actual spending exceeds your allocated budget by <span class="budget-warning-amt" id="budgetOverAmt">$0</span>. Review your line items or increase your budget ceiling.</div>
     </div>
   </div>
+  <div class="lead">Tap any line to set what you've <em>planned</em> to spend and what you've <em>actually</em> paid. Leave anything at $0 if it doesn't apply.</div>
   <div id="budgetList"></div>
   <div class="action-row">
-    <button class="btn secondary full" onclick="addBudgetItem()">+ Add Line Item</button>
+    <button class="btn secondary full" onclick="addBudgetItem()">+ Add your own line</button>
   </div>
-  <div class="card teal" style="margin-top:.85rem">
-    <div class="card-title">Cash Flow</div>
-    <div class="field"><label>Cash Out (big expenses)</label><textarea id="cashOut" placeholder="Venue deposit, bridal package, photography…"></textarea></div>
-    <div class="field"><label>Cash In (offsets)</label><textarea id="cashIn" placeholder="Duit salam, hantaran ($6k–$15k market rate), angpow…"></textarea></div>
+  <div class="acc teal" id="accCash" style="margin-top:.85rem">
+    <button class="acc-head" onclick="toggleAcc('accCash')" aria-expanded="false">
+      <span class="acc-head-txt">
+        <span class="acc-title">Money coming in &amp; out</span>
+        <span class="acc-sub">Deposits, hantaran, duit salam, angpow</span>
+      </span>
+      <span class="acc-caret">▾</span>
+    </button>
+    <div class="acc-body">
+      <div class="field"><label>Going out — the big payments</label><textarea id="cashOut" placeholder="Venue deposit, bridal package, photography…"></textarea></div>
+      <div class="field"><label>Coming in — what offsets it</label><textarea id="cashIn" placeholder="Duit salam, hantaran ($6k–$15k market rate), angpow…"></textarea></div>
+    </div>
   </div>
 </div>
 <!-- ═══ PANE 4: VENDORS ═══ -->
 <div class="pane" id="pane-4">
-  <div class="sec-head"><h2><em>Vendors</em></h2><p>All your collaborators</p></div>
+  <div class="sec-head"><h2>People you <em>hire</em></h2><p>Step 5 of 8 · contacts in one place</p></div>
+  <div class="lead">Tap a name to fill in who they are, what they cost, and how to reach them. On the day, everything you need is here.</div>
   <div id="vendorList"></div>
   <div class="action-row">
-    <button class="btn secondary full" onclick="addVendor()">+ Add Vendor</button>
+    <button class="btn secondary full" onclick="addVendor()">+ Add someone else</button>
   </div>
 </div>
 <!-- ═══ PANE 5: OUTFITS ═══ -->
 <div class="pane" id="pane-5">
-  <div class="sec-head"><h2><em>Outfits</em> &amp; Beauty</h2><p>Every look, planned</p></div>
+  <div class="sec-head"><h2><em>Outfits</em> &amp; beauty</h2><p>Step 6 of 8 · every look, planned</p></div>
+  <div class="lead">Most weddings have two or three changes. List each look so nobody's guessing on the day.</div>
   <div class="card">
-    <div class="card-title">Attire Planner</div>
+    <div class="card-title">Your looks</div>
     <div id="outfitList"></div>
-    <div class="action-row"><button class="btn secondary" onclick="addOutfit()">+ Add Look</button></div>
+    <div class="action-row"><button class="btn secondary" onclick="addOutfit()">+ Add a look</button></div>
   </div>
-  <div class="card teal">
-    <div class="card-title">Buy, Rent or Make?</div>
+  <div class="acc teal" id="accBuyRent">
+    <button class="acc-head" onclick="toggleAcc('accBuyRent')" aria-expanded="false">
+      <span class="acc-head-txt">
+        <span class="acc-title">Buy, rent or make?</span>
+        <span class="acc-sub">How you're getting each outfit</span>
+      </span>
+      <span class="acc-caret">▾</span>
+    </button>
+    <div class="acc-body">
     <div class="two-col">
       <div class="field"><label>Bride — Method</label>
         <select>
@@ -769,42 +976,59 @@ hr.div{border:none;border-top:1px solid var(--border);margin:.75rem 0}
       <span class="chip">Off-the-rack + alter</span>
       <span class="chip">Bespoke suit</span>
     </div>
+    </div>
   </div>
-  <div class="card forest">
-    <div class="card-title">MUA — Make-up Artist</div>
-    <div class="two-col">
-      <div class="field"><label>Bride's MUA</label><input type="text" id="muaBride" placeholder="Name / @handle"/></div>
-      <div class="field"><label>Contact</label><input type="text" id="muaBrideContact" placeholder="+65…"/></div>
+  <div class="acc forest" id="accMua">
+    <button class="acc-head" onclick="toggleAcc('accMua')" aria-expanded="false">
+      <span class="acc-head-txt">
+        <span class="acc-title">Hair &amp; make-up</span>
+        <span class="acc-sub">Your MUA and how to reach them</span>
+      </span>
+      <span class="acc-caret">▾</span>
+    </button>
+    <div class="acc-body">
+      <div class="two-col">
+        <div class="field"><label>Bride's MUA</label><input type="text" id="muaBride" placeholder="Name / @handle"/></div>
+        <div class="field"><label>Phone</label><input type="tel" inputmode="tel" id="muaBrideContact" placeholder="+65…"/></div>
+      </div>
+      <div class="two-col">
+        <div class="field"><label>Groom's MUA</label><input type="text" id="muaGroom" placeholder="Name / @handle"/></div>
+        <div class="field"><label>Phone</label><input type="tel" inputmode="tel" id="muaGroomContact" placeholder="+65…"/></div>
+      </div>
+      <div class="info-block" style="margin-top:.5rem;margin-bottom:0">Ask to see a full wedding day's photos, not just the highlight shots. And book a trial if you can.</div>
     </div>
-    <div class="two-col">
-      <div class="field"><label>Groom's MUA</label><input type="text" id="muaGroom" placeholder="Name / @handle"/></div>
-      <div class="field"><label>Contact</label><input type="text" id="muaGroomContact" placeholder="+65…"/></div>
-    </div>
-    <div class="info-block" style="margin-top:.5rem;margin-bottom:0">Look for MUAs with a portfolio that goes beyond Instagram — ask for full wedding day coverage, not just highlight shots.</div>
   </div>
 </div>
 <!-- ═══ PANE 6: ROLES ═══ -->
 <div class="pane" id="pane-6">
-  <div class="sec-head"><h2><em>Roles</em></h2><p>Who does what on the day</p></div>
+  <div class="sec-head"><h2>Your <em>helpers</em></h2><p>Step 7 of 8 · who does what on the day</p></div>
+  <div class="lead">You can't run your own wedding. Name the people who'll carry things for you, and write down exactly what each one is responsible for.</div>
   <div class="card">
-    <div class="card-title">Key Coordinators</div>
+    <div class="card-title">Your two right hands</div>
     <div class="two-col">
       <div class="field"><label>Maid of Honour</label><input type="text" id="moh" placeholder="Name"/></div>
-      <div class="field"><label>Contact</label><input type="text" id="mohContact" placeholder="+65…"/></div>
+      <div class="field"><label>Phone</label><input type="tel" inputmode="tel" id="mohContact" placeholder="+65…"/></div>
     </div>
     <div class="two-col">
       <div class="field"><label>Best Man</label><input type="text" id="bestman" placeholder="Name"/></div>
-      <div class="field"><label>Contact</label><input type="text" id="bestmanContact" placeholder="+65…"/></div>
+      <div class="field"><label>Phone</label><input type="tel" inputmode="tel" id="bestmanContact" placeholder="+65…"/></div>
     </div>
-    <div class="info-block teal" style="margin-top:.5rem;margin-bottom:0">MOH is your main day-of coordinator. Choose someone calm and decisive — not just your closest friend.</div>
+    <div class="info-block teal" style="margin-top:.5rem;margin-bottom:0">Your MOH runs the day for you. Pick someone calm and decisive — not automatically your closest friend.</div>
   </div>
   <div class="card teal">
-    <div class="card-title">Wedding Party</div>
+    <div class="card-title">Everyone else</div>
     <div id="partyList"></div>
-    <div class="action-row"><button class="btn secondary" onclick="addPartyMember()">+ Add Member</button></div>
+    <div class="action-row"><button class="btn secondary" onclick="addPartyMember()">+ Add a helper</button></div>
   </div>
-  <div class="card forest">
-    <div class="card-title">Responsibility Matrix</div>
+  <div class="acc forest" id="accDuties">
+    <button class="acc-head" onclick="toggleAcc('accDuties')" aria-expanded="false">
+      <span class="acc-head-txt">
+        <span class="acc-title">Jobs on the day</span>
+        <span class="acc-sub">Transport, collections, guests, coordination</span>
+      </span>
+      <span class="acc-caret">▾</span>
+    </button>
+    <div class="acc-body">
     <div class="role-grid">
       <div class="role-cell"><div class="role-cell-title">Transport</div><textarea placeholder="Who drives B&G, media team, MUA?">B&G from prep → venue → shoot
 Media team + MUA transport
@@ -819,36 +1043,53 @@ Point of contact for family</textarea></div>
 Brief photographer on schedule
 Timetable with MOH / Best Man</textarea></div>
     </div>
+    </div>
   </div>
 </div>
 <!-- ═══ PANE 7: NOTES ═══ -->
 <div class="pane" id="pane-7">
-  <div class="sec-head"><h2><em>Notes</em></h2><p>Reminders &amp; reflections</p></div>
+  <div class="sec-head"><h2><em>Notes</em> &amp; admin</h2><p>Step 8 of 8 · paperwork and afterwards</p></div>
   <div class="card">
-    <div class="card-title">General Notes</div>
-    <div class="field"><textarea id="generalNotes" rows="5" placeholder="Anything you want to remember…"></textarea></div>
+    <div class="card-title">Anything you want to remember</div>
+    <div class="field"><textarea id="generalNotes" rows="5" placeholder="Ideas, questions to ask, things people told you…"></textarea></div>
   </div>
-  <div class="card teal">
-    <div class="card-title">Nikah Registration</div>
-    <div style="font-size:.75rem;color:var(--tm);line-height:1.7;margin-bottom:.75rem">Earliest registration date: <strong>150 days before wedding</strong>. Duit salam for Kadi: approx. $150.</div>
-    <div class="two-col">
-      <div class="field"><label>Kadi Name</label><input type="text" id="kadiName" placeholder="Name"/></div>
-      <div class="field"><label>Registered Date</label><input type="date" id="kadiDate"/></div>
-    </div>
-    <div class="chip-label">Marriage Prep Courses</div>
-    <div class="chips">
-      <span class="chip teal-chip">Cinta Abadi – SPMC</span>
-      <span class="chip teal-chip">Marriage &amp; Family – BDMI</span>
-      <span class="chip teal-chip">Marriage Guidance – MCAS</span>
+  <div class="acc teal" id="accNikah">
+    <button class="acc-head" onclick="toggleAcc('accNikah')" aria-expanded="false">
+      <span class="acc-head-txt">
+        <span class="acc-title">Nikah registration</span>
+        <span class="acc-sub">Kadi, dates and marriage prep course</span>
+      </span>
+      <span class="acc-caret">▾</span>
+    </button>
+    <div class="acc-body">
+      <div class="lead">You can register from <strong>150 days before</strong> the wedding at the earliest. Set aside about $150 duit salam for the Kadi.</div>
+      <div class="two-col">
+        <div class="field"><label>Kadi's name</label><input type="text" id="kadiName" placeholder="Name"/></div>
+        <div class="field"><label>Date registered</label><input type="date" id="kadiDate"/></div>
+      </div>
+      <div class="chip-label">Marriage prep courses</div>
+      <div class="chips">
+        <span class="chip teal-chip">Cinta Abadi – SPMC</span>
+        <span class="chip teal-chip">Marriage &amp; Family – BDMI</span>
+        <span class="chip teal-chip">Marriage Guidance – MCAS</span>
+      </div>
     </div>
   </div>
-  <div class="card forest">
-    <div class="card-title">Post-Wedding</div>
-    <div class="two-col">
-      <div class="field"><label>Honeymoon Destination</label><input type="text" id="honeymoon" placeholder="Where to?"/></div>
-      <div class="field"><label>Honeymoon Budget</label><input type="number" id="honeymoonBudget" placeholder="5000"/></div>
+  <div class="acc forest" id="accPost">
+    <button class="acc-head" onclick="toggleAcc('accPost')" aria-expanded="false">
+      <span class="acc-head-txt">
+        <span class="acc-title">After the wedding</span>
+        <span class="acc-sub">Honeymoon and your new address</span>
+      </span>
+      <span class="acc-caret">▾</span>
+    </button>
+    <div class="acc-body">
+      <div class="two-col">
+        <div class="field"><label>Honeymoon — where?</label><input type="text" id="honeymoon" placeholder="Where to?"/></div>
+        <div class="field"><label>Honeymoon budget</label><input type="number" inputmode="numeric" id="honeymoonBudget" placeholder="5000"/></div>
+      </div>
+      <div class="field"><label>New address</label><textarea id="newAddress" rows="2" placeholder="Block, street, unit, postal code…"></textarea></div>
     </div>
-    <div class="field"><label>New Address</label><textarea id="newAddress" rows="2" placeholder="Block, Street, Unit, Postal Code…"></textarea></div>
   </div>
   <div style="text-align:center;padding:1.5rem .5rem;margin-bottom:.5rem">
     <div style="font-size:3.5rem;opacity:.1;font-family:serif;margin-bottom:.5rem">懐く</div>
@@ -857,55 +1098,77 @@ Timetable with MOH / Best Man</textarea></div>
     <div class="action-row" style="justify-content:center;margin-top:1rem;flex-wrap:wrap">
       <button class="btn secondary pwa-only" onclick="openShare()">🔗 Share link</button>
       <button class="btn secondary pwa-only" onclick="installApp()">📲 Save to phone</button>
-      <button class="btn" onclick="downloadHTML()">⬇ Export HTML</button>
+      <button class="btn" onclick="downloadHTML()">⬇ Download a copy</button>
     </div>
   </div>
 </div>
-</main>
-<!-- PANE NAV BAR -->
-<div class="pane-nav-bar" id="paneNavBar">
-  <button class="btn-pnav" id="pnbPrev" onclick="paneNavGo(-1)" disabled>← Prev</button>
-  <div class="pnb-center">
-    <span class="pnb-title" id="pnbTitle">Overview</span>
-    <span id="pnbStep">1 of 8</span>
-  </div>
-  <button class="btn-pnav" id="pnbNext" onclick="paneNavGo(1)">Next →</button>
+<!-- IN-FLOW STEP NAV -->
+<div class="step-nav" id="stepNav">
+  <button class="btn-step" id="stepPrev" onclick="paneNavGo(-1)">
+    <small>← Back to</small><span id="stepPrevName">Home</span>
+  </button>
+  <button class="btn-step primary" id="stepNext" onclick="paneNavGo(1)">
+    <small>Next up →</small><span id="stepNextName">To-do list</span>
+  </button>
 </div>
+</main>
 <!-- BOTTOM NAV -->
 <nav class="bottom-nav">
-  <button class="nav-btn active" onclick="switchTab(0)" id="nav-0">
-    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M3 9l4-4 5 3 5-3 4 4v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
-    <span>Overview</span>
+  <button class="nav-btn active" data-tab="0" onclick="switchTab(0)" id="nav-0">
+    <svg viewBox="0 0 24 24"><path d="M3 10.5L12 3l9 7.5"/><path d="M5 9.5V20a1 1 0 001 1h12a1 1 0 001-1V9.5"/><path d="M9.5 21v-6h5v6"/></svg>
+    <span>Home</span>
   </button>
-  <button class="nav-btn" onclick="switchTab(1)" id="nav-1">
+  <button class="nav-btn" data-tab="1" onclick="switchTab(1)" id="nav-1">
     <svg viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
-    <span>Checklist</span>
+    <span>To-do</span>
   </button>
-  <button class="nav-btn" onclick="switchTab(2)" id="nav-2">
-    <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-    <span>Itinerary</span>
-  </button>
-  <button class="nav-btn" onclick="switchTab(3)" id="nav-3">
+  <button class="nav-btn" data-tab="3" onclick="switchTab(3)" id="nav-3">
     <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
     <span>Budget</span>
   </button>
-  <button class="nav-btn" onclick="switchTab(4)" id="nav-4">
+  <button class="nav-btn" data-tab="2" onclick="switchTab(2)" id="nav-2">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>
+    <span>The day</span>
+  </button>
+  <button class="nav-btn" id="navMore" onclick="openMore()">
+    <svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="19" cy="12" r="1.4"/></svg>
+    <span>More</span>
+  </button>
+  <!-- shown only on wide screens, where the sidebar has room for everything -->
+  <button class="nav-btn desk-only" data-tab="4" onclick="switchTab(4)" id="nav-4">
     <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
     <span>Vendors</span>
   </button>
-  <button class="nav-btn" onclick="switchTab(5)" id="nav-5">
+  <button class="nav-btn desk-only" data-tab="5" onclick="switchTab(5)" id="nav-5">
     <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
     <span>Outfits</span>
   </button>
-  <button class="nav-btn" onclick="switchTab(6)" id="nav-6">
+  <button class="nav-btn desk-only" data-tab="6" onclick="switchTab(6)" id="nav-6">
     <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-    <span>Roles</span>
+    <span>Helpers</span>
   </button>
-  <button class="nav-btn" onclick="switchTab(7)" id="nav-7">
-    <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+  <button class="nav-btn desk-only" data-tab="7" onclick="switchTab(7)" id="nav-7">
+    <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
     <span>Notes</span>
   </button>
 </nav>
+<!-- MORE SHEET -->
+<div class="sheet" id="moreSheet">
+  <div class="sheet-card">
+    <div class="sheet-handle"></div>
+    <div class="sheet-label">Other parts of your plan</div>
+    <button class="sheet-item" id="more-4" onclick="goFromMore(4)"><span class="si-ico">🤝</span><span>Vendors<span class="si-sub">Photographer, caterer, MUA and the rest</span></span></button>
+    <button class="sheet-item" id="more-5" onclick="goFromMore(5)"><span class="si-ico">👗</span><span>Outfits &amp; beauty<span class="si-sub">Every look and who's doing hair &amp; make-up</span></span></button>
+    <button class="sheet-item" id="more-6" onclick="goFromMore(6)"><span class="si-ico">👥</span><span>Your helpers<span class="si-sub">Who does what on the day</span></span></button>
+    <button class="sheet-item" id="more-7" onclick="goFromMore(7)"><span class="si-ico">📝</span><span>Notes &amp; admin<span class="si-sub">Nikah registration, honeymoon, reminders</span></span></button>
+    <div class="sheet-label">Your plan</div>
+    <button class="sheet-item pwa-only" onclick="closeMore();openShare()"><span class="si-ico">🔗</span><span>Share with your partner<span class="si-sub">Send a link that carries the whole plan</span></span></button>
+    <button class="sheet-item pwa-only" onclick="closeMore();installApp()"><span class="si-ico">📲</span><span>Save to your phone<span class="si-sub">Opens like an app, works offline</span></span></button>
+    <button class="sheet-item" onclick="closeMore();downloadHTML()"><span class="si-ico">⬇</span><span>Download a copy<span class="si-sub">One file you can keep or email</span></span></button>
+    <button class="sheet-item" onclick="closeMore();openSetup(false)"><span class="si-ico">✨</span><span>Redo the guided setup<span class="si-sub">Walk through the basics again</span></span></button>
+    <button class="btn secondary full" onclick="closeMore()" style="margin-top:.8rem">Close</button>
+  </div>
+</div>
 <div class="toast" id="toast">Saved ✓</div>
 <div class="overlay" id="overlay"><div class="overlay-text" id="overlayText">Generating HTML…</div></div>
 <!-- SHARE MODAL -->
@@ -924,6 +1187,88 @@ Timetable with MOH / Best Man</textarea></div>
     </div>
     <button class="btn secondary full" id="nativeShareBtn" onclick="nativeShare()" style="display:none">Send to partner…</button>
     <div class="share-note">This link carries your whole plan — anyone with it can view and copy it. The QR code only opens the planner app.</div>
+  </div>
+</div>
+<!-- ═══ GUIDED SETUP WIZARD ═══ -->
+<div class="setup" id="setup">
+  <div class="setup-top">
+    <div class="setup-top-row">
+      <div class="setup-brand">懐く <em style="font-style:italic;opacity:.7">Wedding</em></div>
+      <button class="setup-skip" onclick="closeSetup()">Skip for now</button>
+    </div>
+    <div class="setup-dots" id="setupDots"></div>
+  </div>
+  <div class="setup-scroll">
+  <div class="setup-body">
+    <!-- 1 — NAMES -->
+    <div class="setup-step active" data-step="0">
+      <div class="setup-eyebrow">Question 1 of 7</div>
+      <div class="setup-q">Who's getting <em>married</em>?</div>
+      <div class="setup-help">We'll use your names throughout the planner. Nothing is sent anywhere — everything stays on this device unless you share it.</div>
+      <label class="setup-label" for="su_p1">Partner 1</label>
+      <input class="setup-input" id="su_p1" type="text" placeholder="First name" autocomplete="off"/>
+      <label class="setup-label" for="su_p2">Partner 2</label>
+      <input class="setup-input" id="su_p2" type="text" placeholder="First name" autocomplete="off"/>
+    </div>
+    <!-- 2 — DATE -->
+    <div class="setup-step" data-step="1">
+      <div class="setup-eyebrow">Question 2 of 7</div>
+      <div class="setup-q">When's the <em>big day</em>?</div>
+      <div class="setup-help">Don't have a date confirmed yet? Put in your best guess — you can change it any time, and we'll count down for you.</div>
+      <label class="setup-label" for="su_wDate">Wedding date</label>
+      <input class="setup-input" id="su_wDate" type="date" oninput="setupDateEcho()"/>
+      <div class="setup-readout" id="su_dateEcho" style="display:none"></div>
+    </div>
+    <!-- 3 — VENUE -->
+    <div class="setup-step" data-step="2">
+      <div class="setup-eyebrow">Question 3 of 7</div>
+      <div class="setup-q">Where will it <em>happen</em>?</div>
+      <div class="setup-help">A venue name, a neighbourhood, or just "still looking". This is only for your own reference.</div>
+      <label class="setup-label" for="su_wVenue">Venue</label>
+      <input class="setup-input" id="su_wVenue" type="text" placeholder="e.g. Void deck, hotel ballroom, community club" autocomplete="off"/>
+      <div class="opt-grid" id="su_venueOpts"></div>
+    </div>
+    <!-- 4 — GUESTS -->
+    <div class="setup-step" data-step="3">
+      <div class="setup-eyebrow">Question 4 of 7</div>
+      <div class="setup-q">Roughly how many <em>guests</em>?</div>
+      <div class="setup-help">This is the single biggest driver of cost, so a rough number now saves a lot of rework later. Tap a range or type your own.</div>
+      <div class="opt-grid" id="su_guestOpts"></div>
+      <label class="setup-label" for="su_guestCount">Number of guests</label>
+      <input class="setup-input" id="su_guestCount" type="number" inputmode="numeric" placeholder="200" oninput="setupBudgetEcho()"/>
+    </div>
+    <!-- 5 — BUDGET -->
+    <div class="setup-step" data-step="4">
+      <div class="setup-eyebrow">Question 5 of 7</div>
+      <div class="setup-q">What can you <em>spend</em>?</div>
+      <div class="setup-help">Your total ceiling, everything included. Be honest rather than optimistic — the planner will warn you when you're heading over.</div>
+      <div class="opt-grid" id="su_budgetOpts"></div>
+      <label class="setup-label" for="su_totalBudget">Total budget (SGD)</label>
+      <input class="setup-input" id="su_totalBudget" type="number" inputmode="numeric" placeholder="25000" oninput="setupBudgetEcho()"/>
+      <div class="setup-readout" id="su_budgetEcho" style="display:none"></div>
+    </div>
+    <!-- 6 — PRIORITIES -->
+    <div class="setup-step" data-step="5">
+      <div class="setup-eyebrow">Question 6 of 7</div>
+      <div class="setup-q">What <em>matters most</em>?</div>
+      <div class="setup-help">Pick the few things you'd protect if money got tight. Everything you tap becomes a "must have" — you can rank the rest later.</div>
+      <div class="opt-grid" id="su_priOpts"></div>
+    </div>
+    <!-- 7 — DONE -->
+    <div class="setup-step" data-step="6">
+      <div class="setup-eyebrow">All set</div>
+      <div class="setup-q">You're <em>ready</em> to plan.</div>
+      <div class="setup-help">Here's what we've got. Everything below is editable at any time, and your plan saves itself as you type.</div>
+      <div class="setup-readout" id="su_summary"></div>
+      <div class="setup-help" style="margin-bottom:0">Next you'll land on your home screen, with a countdown, your next few tasks, and a shortcut to every part of the plan.</div>
+    </div>
+  </div>
+  </div>
+  <div class="setup-foot">
+    <div class="setup-foot-inner">
+      <button class="setup-back" id="su_back" onclick="setupGo(-1)" aria-label="Back">←</button>
+      <button class="btn" id="su_next" onclick="setupGo(1)">Continue</button>
+    </div>
   </div>
 </div>
 <!-- INSTALL HINT MODAL -->
@@ -950,22 +1295,55 @@ const S = {
 };
 function escAttr(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 /* ═══════════════════════ TABS ═══════════════════════ */
-const TAB_NAMES=['Overview','Checklist','Itinerary','Budget','Vendors','Outfits','Roles','Notes'];
+/* Panes stay in their original order so every existing render function
+   keeps working; the bottom bar only surfaces the five most-used ones. */
+const TAB_NAMES=['Home','To-do list','The day','Budget','Vendors','Outfits','Helpers','Notes'];
+const MORE_TABS=[4,5,6,7];
 let currentTab=0;
 function switchTab(i){
   currentTab=i;
+  closeMore();
   document.querySelectorAll('.pane').forEach((p,j)=>p.classList.toggle('active',j===i));
-  document.querySelectorAll('.nav-btn').forEach((b,j)=>b.classList.toggle('active',j===i));
+  document.querySelectorAll('.nav-btn[data-tab]').forEach(b=>b.classList.toggle('active',+b.dataset.tab===i));
+  const more=document.getElementById('navMore');
+  if(more) more.classList.toggle('active',MORE_TABS.indexOf(i)>-1);
   window.scrollTo({top:0,left:0,behavior:'instant'});
-  updatePaneNav(i);
+  updateStepNav(i);
+  if(i===0) renderHome();
 }
-function updatePaneNav(i){
-  document.getElementById('pnbTitle').textContent=TAB_NAMES[i];
-  document.getElementById('pnbStep').textContent=`${i+1} of ${TAB_NAMES.length}`;
-  document.getElementById('pnbPrev').disabled=(i===0);
-  document.getElementById('pnbNext').disabled=(i===TAB_NAMES.length-1);
+function updateStepNav(i){
+  const prev=document.getElementById('stepPrev'), next=document.getElementById('stepNext');
+  if(!prev||!next) return;
+  prev.disabled=(i===0);
+  next.disabled=(i===TAB_NAMES.length-1);
+  document.getElementById('stepPrevName').textContent=TAB_NAMES[Math.max(0,i-1)];
+  document.getElementById('stepNextName').textContent=TAB_NAMES[Math.min(TAB_NAMES.length-1,i+1)];
+  next.style.display=(i===TAB_NAMES.length-1)?'none':'flex';
+  prev.style.display=(i===0)?'none':'flex';
 }
 function paneNavGo(dir){switchTab(Math.max(0,Math.min(TAB_NAMES.length-1,currentTab+dir)));}
+/* ═══════════════════════ MORE SHEET ═════════════════ */
+function openMore(){
+  MORE_TABS.forEach(t=>{
+    const el=document.getElementById('more-'+t);
+    if(el) el.classList.toggle('on',currentTab===t);
+  });
+  document.getElementById('moreSheet').classList.add('show');
+}
+function closeMore(){const s=document.getElementById('moreSheet');if(s)s.classList.remove('show');}
+function goFromMore(i){closeMore();switchTab(i);}
+/* ═══════════════════════ ACCORDIONS ═════════════════ */
+function toggleAcc(id){
+  const el=document.getElementById(id);
+  if(!el) return;
+  const open=el.classList.toggle('open');
+  const head=el.querySelector('.acc-head');
+  if(head) head.setAttribute('aria-expanded',open?'true':'false');
+  if(open) setTimeout(()=>{
+    const r=el.getBoundingClientRect();
+    if(r.top<56||r.top>window.innerHeight-160) el.scrollIntoView({block:'start',behavior:'smooth'});
+  },60);
+}
 /* ═══════════════════════ TOAST ══════════════════════ */
 function showToast(msg='Saved ✓') {
   const t = document.getElementById('toast');
@@ -994,7 +1372,7 @@ function persist() {
   try { localStorage.setItem('natsuku_wp', JSON.stringify(buildData())); } catch(e) {}
 }
 function flashSaved(dur) {
-  const btn = document.querySelector('.btn-save');
+  const btn = document.getElementById('savePill');
   if (!btn) return;
   btn.classList.add('saved');
   setTimeout(()=>btn.classList.remove('saved'), dur||1500);
@@ -1058,18 +1436,136 @@ function restoreRoleTexts(texts) {
 /* ─── auto-save on input ─── */
 let saveTimer;
 document.addEventListener('input', ()=>{ clearTimeout(saveTimer); saveTimer=setTimeout(autoSave,700); });
-/* ═══════════════════════ COUNTDOWN ══════════════════ */
-function updateCountdown() {
-  const dateVal = v('wDate');
-  if (!dateVal) { document.getElementById('cdDays').textContent='—'; return; }
-  const diff = Math.ceil((new Date(dateVal)-new Date())/(1000*60*60*24));
-  document.getElementById('cdDays').textContent = diff > 0 ? diff : (diff===0?'Today':'—');
-  const total = document.querySelectorAll('#checklistCt input[type=checkbox]').length;
-  const done = document.querySelectorAll('#checklistCt input[type=checkbox]:checked').length;
-  const pct = total ? Math.round(done/total*100) : 0;
-  document.getElementById('cdProgress').textContent = pct + '%';
+/* ═══════════════════════ HOME DASHBOARD ═════════════ */
+function daysUntil(){
+  const dateVal=v('wDate');
+  if(!dateVal) return null;
+  const d=new Date(dateVal+'T00:00:00');
+  if(isNaN(d)) return null;
+  const today=new Date(); today.setHours(0,0,0,0);
+  return Math.round((d-today)/86400000);
 }
-document.getElementById('wDate').addEventListener('change', updateCountdown);
+function heroNum(id,num,unit){
+  const el=document.getElementById(id);
+  if(el) el.innerHTML=String(num)+(unit?`<small>${unit}</small>`:'');
+}
+function fmtDate(str){
+  const d=new Date(str+'T00:00:00');
+  if(isNaN(d)) return '';
+  return d.toLocaleDateString(undefined,{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+}
+function taskCounts(){
+  const all=document.querySelectorAll('#checklistCt input[type=checkbox]');
+  const done=document.querySelectorAll('#checklistCt input[type=checkbox]:checked');
+  return {total:all.length,done:done.length,pct:all.length?Math.round(done.length/all.length*100):0};
+}
+function updateCountdown() {
+  const diff=daysUntil();
+  if(diff===null) heroNum('cdDays','—','');
+  else if(diff>0) heroNum('cdDays',diff,'days');
+  else if(diff===0) heroNum('cdDays','Today','');
+  else heroNum('cdDays','🎉','married');
+  const c=taskCounts();
+  heroNum('cdProgress',c.pct,'%');
+  const bar=document.getElementById('heroBar');
+  if(bar) bar.style.width=c.pct+'%';
+  const lbl=document.getElementById('heroBarLabel');
+  if(lbl) lbl.textContent=`${c.done} of ${c.total} tasks done`;
+  const rt=document.getElementById('heroBarRight');
+  if(rt) rt.textContent=c.pct===0?'Start anywhere':c.pct===100?'All done ✓':c.pct<40?'Good start':'Nearly there';
+}
+function renderHome(){
+  const a=v('p1').trim(), b=v('p2').trim();
+  const names=(a&&b)?`${a} <em>&amp;</em> ${b}`:(a||b)?(a||b):'Your wedding <em>plan</em>';
+  const hn=document.getElementById('heroNames'); if(hn) hn.innerHTML=names;
+  const hdr=document.getElementById('hdrNames');
+  if(hdr) hdr.innerHTML=(a&&b)?`${a} <em>&amp;</em> ${b}`:'懐く <em>Wedding</em>';
+  const dateVal=v('wDate'), venue=v('wVenue').trim();
+  const bits=[];
+  if(dateVal) bits.push(fmtDate(dateVal));
+  if(venue) bits.push(venue);
+  const when=document.getElementById('heroWhen');
+  if(when) when.textContent=bits.length?bits.join(' · '):'Open “Wedding details” below to begin';
+  const diff=daysUntil();
+  const hs=document.getElementById('hdrSub');
+  if(hs) hs.textContent=(diff!==null&&diff>0)?`${diff} days to go`:(diff===0?'Today is the day':'fondly remembered · natsuku');
+  updateCountdown();
+  renderNextUp();
+  renderTiles();
+}
+/* Next three unticked tasks, earliest group first */
+function renderNextUp(){
+  const el=document.getElementById('nextUp');
+  if(!el) return;
+  const pending=[];
+  TASKS.forEach((group,gi)=>{
+    group.items.forEach((item,ii)=>{
+      const cb=document.getElementById(`chk-${gi}-${ii}`);
+      if(cb&&!cb.checked) pending.push({id:cb.id,name:item.n,when:group.group});
+    });
+  });
+  S.customTasks.forEach(t=>{
+    if(!t.done&&t.name&&t.name.trim()) pending.push({id:'chk-'+t.id,name:t.name,when:(TASKS[t.gi]||{}).group||'Your task'});
+  });
+  el.innerHTML='';
+  if(!pending.length){
+    el.innerHTML='<div class="nextup-done">Every task is ticked off. Enjoy the day. 🎉</div>';
+    return;
+  }
+  pending.slice(0,3).forEach(t=>{
+    const btn=document.createElement('button');
+    btn.className='nextup-item';
+    btn.onclick=()=>jumpToTask(t.id);
+    btn.innerHTML=`<span class="nextup-check"></span>
+      <span class="nextup-body">
+        <span class="nextup-name">${escAttr(t.name)}</span>
+        <span class="nextup-when">${escAttr(t.when)}</span>
+      </span>`;
+    el.appendChild(btn);
+  });
+}
+function jumpToTask(id){
+  switchTab(1);
+  setTimeout(()=>{
+    const cb=document.getElementById(id);
+    if(!cb) return;
+    const row=cb.closest('.check-item');
+    if(row){
+      row.scrollIntoView({block:'center',behavior:'smooth'});
+      row.style.transition='background .4s';
+      row.style.background='rgba(161,130,107,.16)';
+      setTimeout(()=>{row.style.background='';},1400);
+    }
+  },90);
+}
+function renderTiles(){
+  const alloc=S.budgetRows.reduce((s,r)=>s+(r.alloc||0),0);
+  const spent=S.budgetRows.reduce((s,r)=>s+(r.actual||0),0);
+  const total=parseFloat(v('totalBudget'))||0;
+  const tb=document.getElementById('tileBudget');
+  if(tb) tb.textContent = total ? `$${spent.toLocaleString()} spent of $${total.toLocaleString()}`
+    : alloc ? `$${alloc.toLocaleString()} planned` : 'Set your budget';
+  const ti=document.getElementById('tileItin');
+  if(ti) ti.textContent=S.itinRows.length?`${S.itinRows.length} moments planned`:'Build your timeline';
+  const booked=S.vendors.filter(x=>x.booked==='confirmed').length;
+  const tv=document.getElementById('tileVendors');
+  if(tv) tv.textContent=booked?`${booked} of ${S.vendors.length} confirmed`:`${S.vendors.length} still to confirm`;
+  const named=S.partyMembers.filter(m=>m.name&&m.name.trim()).length;
+  const tp=document.getElementById('tileParty');
+  if(tp) tp.textContent=named?`${named} named`:'Who does what';
+}
+/* Keep the sticky budget bar flush under the header at any text size */
+function syncHeaderHeight(){
+  const h=document.querySelector('.top-bar');
+  if(h) document.documentElement.style.setProperty('--hdr-h',h.offsetHeight+'px');
+}
+window.addEventListener('resize',syncHeaderHeight);
+const _wd=document.getElementById('wDate');
+if(_wd) _wd.addEventListener('change', ()=>{updateCountdown();renderHome();});
+['p1','p2','wVenue'].forEach(id=>{
+  const el=document.getElementById(id);
+  if(el) el.addEventListener('input',renderHome);
+});
 /* ═══════════════════════ PRIORITIES ════════════════ */
 const PRI_SUBS = ['Venue','Catering','Photography','Videography','Florals',
   'Bridal Attire','Groom Attire','Door Gifts','Emcee','Kompang',
@@ -1124,6 +1620,7 @@ function updateOverviewBudget() {
   document.getElementById('perHead').textContent = guests ? '$'+Math.round(budget/guests).toLocaleString() : '—';
   const totalAlloc = S.budgetRows.reduce((s,r)=>s+(r.alloc||0),0);
   document.getElementById('alreadyBudgeted').textContent = '$'+totalAlloc.toLocaleString();
+  renderTiles();
 }
 /* ═══════════════════════ CHECKLIST ══════════════════ */
 const TASKS = [
@@ -1212,6 +1709,7 @@ function updateCheckProgress() {
   document.getElementById('checkBar').style.width=pct+'%';
   document.getElementById('checkLabel').textContent=`${done.length} of ${all.length} tasks`;
   document.getElementById('checkPct').textContent=pct+'%';
+  renderNextUp();
 }
 function renderCustomTasks() {
   document.querySelectorAll('.check-custom').forEach(c=>{ c.innerHTML=''; });
@@ -1724,8 +2222,8 @@ function downloadHTML() {
     const savedData=localStorage.getItem('natsuku_wp')||'';
     // Clone the live document so transient UI state doesn't leak into the export
     const clone=document.documentElement.cloneNode(true);
-    clone.querySelectorAll('.overlay.show, #toast.show').forEach(el=>el.classList.remove('show'));
-    const sb=clone.querySelector('.btn-save.saved'); if(sb) sb.classList.remove('saved');
+    clone.querySelectorAll('.overlay.show, #toast.show, .sheet.show, .setup.show').forEach(el=>el.classList.remove('show'));
+    const sb=clone.querySelector('#savePill.saved'); if(sb) sb.classList.remove('saved');
     // Strip host-only PWA/share affordances so the standalone file has no broken refs
     clone.querySelectorAll('.pwa-only').forEach(el=>el.remove());
     clone.querySelectorAll('link[rel="manifest"], link[rel="apple-touch-icon"], link[rel="icon"], meta[name="theme-color"]').forEach(el=>el.remove());
@@ -1914,8 +2412,148 @@ function closeInstallHint(){document.getElementById('installHint').classList.rem
 if('serviceWorker' in navigator && location.protocol.indexOf('http')===0){
   window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{});});
 }
-/* close modals on backdrop click */
-document.addEventListener('click',e=>{ if(e.target.classList&&e.target.classList.contains('modal'))e.target.classList.remove('show'); });
+/* close modals / sheet on backdrop click */
+document.addEventListener('click',e=>{
+  if(!e.target.classList) return;
+  if(e.target.classList.contains('modal')) e.target.classList.remove('show');
+  if(e.target.classList.contains('sheet')) e.target.classList.remove('show');
+});
+/* ═══════════════════════ GUIDED SETUP ════════════════
+   A short, one-question-per-screen form that fills in the basics
+   every other part of the planner builds on. It writes straight into
+   the real fields, so nothing here is a separate source of truth. */
+const SETUP_STEPS=7;
+const SU_FIELDS=['p1','p2','wDate','wVenue','guestCount','totalBudget'];
+const SU_VENUES=['Void deck','Community club','Hotel ballroom','Restaurant','Outdoors','Still looking'];
+const SU_GUESTS=[{l:'Under 100',v:80},{l:'Around 200',v:200},{l:'Around 400',v:400},{l:'600+',v:600}];
+const SU_BUDGETS=[{l:'$10k',v:10000},{l:'$20k',v:20000},{l:'$35k',v:35000},{l:'$50k+',v:50000}];
+const SU_PRIORITIES=['Photography','Videography','Catering','Venue','Bridal Attire','Groom Attire',
+  'Florals','MUA','Kompang','Hantaran','Door Gifts','Wedding Cake','Emcee','Honeymoon'];
+let setupStep=0, suPri=[];
+function buildSetupOptions(){
+  const dots=document.getElementById('setupDots');
+  dots.innerHTML='';
+  for(let i=0;i<SETUP_STEPS;i++){
+    const d=document.createElement('div'); d.className='setup-dot'; dots.appendChild(d);
+  }
+  const mk=(host,label,onTap)=>{
+    const b=document.createElement('button');
+    b.type='button'; b.className='opt'; b.textContent=label; b.onclick=()=>onTap(b);
+    host.appendChild(b); return b;
+  };
+  const vh=document.getElementById('su_venueOpts');
+  SU_VENUES.forEach(name=>mk(vh,name,b=>{
+    vh.querySelectorAll('.opt').forEach(o=>o.classList.remove('on'));
+    b.classList.add('on');
+    document.getElementById('su_wVenue').value=name;
+  }));
+  const gh=document.getElementById('su_guestOpts');
+  SU_GUESTS.forEach(o=>mk(gh,o.l,b=>{
+    gh.querySelectorAll('.opt').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on');
+    document.getElementById('su_guestCount').value=o.v;
+    setupBudgetEcho();
+  }));
+  const bh=document.getElementById('su_budgetOpts');
+  SU_BUDGETS.forEach(o=>mk(bh,o.l,b=>{
+    bh.querySelectorAll('.opt').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on');
+    document.getElementById('su_totalBudget').value=o.v;
+    setupBudgetEcho();
+  }));
+  const ph=document.getElementById('su_priOpts');
+  SU_PRIORITIES.forEach(name=>mk(ph,name,b=>{
+    const on=b.classList.toggle('on');
+    if(on){ if(suPri.indexOf(name)<0) suPri.push(name); }
+    else suPri=suPri.filter(x=>x!==name);
+  }));
+}
+function setupDateEcho(){
+  const val=document.getElementById('su_wDate').value;
+  const box=document.getElementById('su_dateEcho');
+  if(!val){ box.style.display='none'; return; }
+  const d=new Date(val+'T00:00:00');
+  if(isNaN(d)){ box.style.display='none'; return; }
+  const today=new Date(); today.setHours(0,0,0,0);
+  const days=Math.round((d-today)/86400000);
+  box.style.display='block';
+  box.innerHTML = days>0
+    ? `<strong>${days} days</strong> from today — ${fmtDate(val)}`
+    : days===0 ? `<strong>Today!</strong>` : `That date has passed — double-check it?`;
+}
+function setupBudgetEcho(){
+  const b=parseFloat(document.getElementById('su_totalBudget').value)||0;
+  const g=parseFloat(document.getElementById('su_guestCount').value)||0;
+  const box=document.getElementById('su_budgetEcho');
+  if(!b||!g){ box.style.display='none'; return; }
+  box.style.display='block';
+  box.innerHTML=`That's <strong>$${Math.round(b/g).toLocaleString()}</strong> per guest across ${g.toLocaleString()} people.`;
+}
+function openSetup(firstRun){
+  setupStep=0;
+  buildSetupOptions();
+  SU_FIELDS.forEach(id=>{ const el=document.getElementById('su_'+id); if(el) el.value=v(id); });
+  suPri=S.priorityItems.filter(p=>p.key==='HH').map(p=>p.name);
+  document.querySelectorAll('#su_priOpts .opt').forEach(o=>o.classList.toggle('on',suPri.indexOf(o.textContent)>-1));
+  const skip=document.querySelector('.setup-skip');
+  if(skip) skip.textContent=firstRun?'Skip for now':'Close';
+  setupDateEcho(); setupBudgetEcho();
+  renderSetupStep();
+  document.getElementById('setup').classList.add('show');
+}
+function renderSetupStep(){
+  document.querySelectorAll('.setup-step').forEach(s=>s.classList.toggle('active',+s.dataset.step===setupStep));
+  document.querySelectorAll('.setup-dot').forEach((d,i)=>d.classList.toggle('done',i<=setupStep));
+  document.getElementById('su_back').disabled=(setupStep===0);
+  document.getElementById('su_next').textContent=(setupStep===SETUP_STEPS-1)?'Start planning':'Continue';
+  const sc=document.querySelector('.setup-scroll');
+  if(sc) sc.scrollTop=0;
+  if(setupStep===SETUP_STEPS-1) renderSetupSummary();
+}
+function renderSetupSummary(){
+  setupCommit();
+  const a=v('p1').trim(), b=v('p2').trim();
+  const rows=[];
+  if(a||b) rows.push(`<strong>${escAttr([a,b].filter(Boolean).join(' & '))}</strong>`);
+  const d=daysUntil();
+  if(v('wDate')) rows.push(fmtDate(v('wDate'))+(d>0?` — ${d} days away`:''));
+  if(v('wVenue').trim()) rows.push(escAttr(v('wVenue').trim()));
+  const g=parseFloat(v('guestCount'))||0, bg=parseFloat(v('totalBudget'))||0;
+  if(g) rows.push(`${g.toLocaleString()} guests`);
+  if(bg) rows.push(`$${bg.toLocaleString()} budget`+(g?` · $${Math.round(bg/g).toLocaleString()} per guest`:''));
+  if(suPri.length) rows.push('Must haves: '+escAttr(suPri.join(', ')));
+  document.getElementById('su_summary').innerHTML=rows.length?rows.join('<br/>'):'Nothing filled in yet — that\'s fine, you can add it all later.';
+}
+/* Copy wizard answers into the real fields + state */
+function setupCommit(){
+  SU_FIELDS.forEach(id=>{
+    const el=document.getElementById('su_'+id);
+    if(el && el.value!=='') sv(id,el.value);
+  });
+  suPri.forEach(name=>{
+    if(!S.priorityItems.some(p=>p.name===name)) S.priorityItems.push({name,key:'HH'});
+  });
+  S.priorityItems=S.priorityItems.filter(p=>p.key!=='HH'||suPri.indexOf(p.name)>-1);
+}
+function setupGo(dir){
+  if(dir>0 && setupStep===SETUP_STEPS-1){ finishSetup(); return; }
+  setupCommit();
+  setupStep=Math.max(0,Math.min(SETUP_STEPS-1,setupStep+dir));
+  renderSetupStep();
+}
+function finishSetup(){
+  setupCommit();
+  closeSetup();
+  showToast('Your plan is ready ✓');
+}
+function closeSetup(){
+  setupCommit();
+  document.getElementById('setup').classList.remove('show');
+  renderMatrix(); renderPriTags(); updateOverviewBudget();
+  switchTab(0);
+  renderHome();
+  persist();
+}
 /* ═══════════════════════ INIT ═══════════════════════ */
 document.addEventListener('DOMContentLoaded',async ()=>{
   if(isStandalone())document.querySelectorAll('button[onclick="installApp()"]').forEach(b=>{b.style.display='none';});
@@ -1927,10 +2565,18 @@ document.addEventListener('DOMContentLoaded',async ()=>{
   initOutfits();
   initParty();
   await maybeLoadSharedPlan();
+  let hadSaved=false;
+  try{ hadSaved=!!localStorage.getItem('natsuku_wp'); }catch(e){}
+  if(!hadSaved && window.__NATSUKU_SEED) hadSaved=true;
   loadAll();
   updateCountdown();
   updateOverviewBudget();
-  updatePaneNav(0);
+  updateStepNav(0);
+  renderHome();
+  syncHeaderHeight();
+  /* First visit: walk them through the basics instead of dropping
+     them into an empty dashboard. */
+  if(!hadSaved) openSetup(true);
 });
 </script>
 

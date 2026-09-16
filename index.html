@@ -1597,6 +1597,7 @@ function buildData() {
 }
 function persist() {
   try { localStorage.setItem('natsuku_wp', JSON.stringify(buildData())); } catch(e) {}
+  stampVisit();
 }
 function flashSaved(dur) {
   const btn = document.getElementById('savePill');
@@ -2781,16 +2782,26 @@ async function decodePlan(payload){
 async function buildShareURL(){return location.origin+location.pathname+'#plan='+await encodePlan();}
 async function maybeLoadSharedPlan(){
   const m=(location.hash||'').match(/plan=([^&]+)/);
-  if(!m)return;
+  if(!m)return false;
   let json;
-  try{json=await decodePlan(m[1]);JSON.parse(json);}catch(e){return;}
+  try{json=await decodePlan(m[1]);JSON.parse(json);}catch(e){return false;}
   let hasLocal=false;try{hasLocal=!!localStorage.getItem('natsuku_wp');}catch(e){}
   if(hasLocal&&!confirm('Open this shared plan? It will replace the plan saved on this device.')){
-    history.replaceState(null,'',location.pathname+location.search);return;
+    history.replaceState(null,'',location.pathname+location.search);return false;
   }
   try{localStorage.setItem('natsuku_wp',json);}catch(e){window.__NATSUKU_SEED=json;}
+  /* Arriving with someone else's plan counts as a fresh arrival, so the
+     start page shows even if this device was in use moments ago. */
+  try{localStorage.removeItem(SEEN_KEY);}catch(e){}
   history.replaceState(null,'',location.pathname+location.search);
+  return true;
 }
+/* A share link opened while the planner is already up only changes the
+   hash, so no load event fires and the plan would be silently ignored. */
+window.addEventListener('hashchange',async ()=>{
+  if(!/plan=/.test(location.hash||'')) return;
+  if(await maybeLoadSharedPlan()) location.reload();
+});
 function renderQR(canvas,text){
   const q=QRGEN(text),size=q.size,mod=q.mod,quiet=4;
   const scale=Math.max(2,Math.floor(200/(size+quiet*2)));
@@ -2850,6 +2861,23 @@ document.addEventListener('click',e=>{
    The first thing anyone opening the link sees. New couples are offered
    the guided setup; returning ones get their countdown and a way back in. */
 let welcomeReturning=false;
+/* Someone dipping back in mid-planning does not need to be greeted every
+   time, so the start page stays out of the way for a few hours after the
+   last visit. The stamp lives outside the plan so it is never carried
+   into a share link or an exported copy. */
+const SEEN_KEY='natsuku_wp_seen';
+const WELCOME_QUIET_MS=4*60*60*1000;
+function stampVisit(){
+  try{ localStorage.setItem(SEEN_KEY,String(Date.now())); }catch(e){}
+}
+function visitedRecently(){
+  try{
+    const t=parseInt(localStorage.getItem(SEEN_KEY)||'0',10);
+    if(!t) return false;
+    const age=Date.now()-t;
+    return age>=0 && age<WELCOME_QUIET_MS;   /* a clock change gives them the start page */
+  }catch(e){ return false; }
+}
 function openWelcome(hasSaved){
   welcomeReturning=!!hasSaved;
   const a=v('p1').trim(), b=v('p2').trim();
@@ -2884,7 +2912,7 @@ function openWelcome(hasSaved){
   }
   document.getElementById('welcome').classList.add('show');
 }
-function closeWelcome(){document.getElementById('welcome').classList.remove('show');}
+function closeWelcome(){document.getElementById('welcome').classList.remove('show');stampVisit();}
 function welcomeStart(){
   closeWelcome();
   if(welcomeReturning) go('home'); else openSetup(true);
@@ -3040,7 +3068,7 @@ document.addEventListener('DOMContentLoaded',async ()=>{
   initOutfits();
   initParty();
   initGuests();
-  await maybeLoadSharedPlan();
+  const sharedImported=await maybeLoadSharedPlan();
   let hadSaved=false;
   try{ hadSaved=!!localStorage.getItem('natsuku_wp'); }catch(e){}
   if(!hadSaved && window.__NATSUKU_SEED) hadSaved=true;
@@ -3050,9 +3078,11 @@ document.addEventListener('DOMContentLoaded',async ()=>{
   updateStepNav(0);
   renderHome();
   syncHeaderHeight();
-  /* Everyone lands on the start page; new couples are offered the
-     guided setup from there, returning ones get straight back in. */
-  openWelcome(hadSaved);
+  /* New couples, anyone opening a shared plan, and anyone coming back
+     after a break get the start page. Someone who was here within the
+     last few hours goes straight to where they left off. */
+  if(hadSaved && !sharedImported && visitedRecently()) stampVisit();
+  else openWelcome(hadSaved);
 });
 </script>
 
